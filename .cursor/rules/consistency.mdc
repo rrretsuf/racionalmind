@@ -1,0 +1,106 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**rules for consistency**
+
+## 1. Uvod in Namen
+
+**Namen:** Ta dokument določa skupek pravil in smernic, katerih cilj je zagotoviti visoko stopnjo **konsistentnosti** v vseh vidikih razvoja aplikacije Inner. Konsistentnost izboljšuje berljivost kode, olajša vzdrževanje, zmanjšuje napake in zagotavlja enotno uporabniško izkušnjo.
+
+**Obveznost:** Vsa koda, komponente, stili in dokumentacija morajo slediti tem pravilom. Odstopanja so dovoljena le izjemoma in morajo biti utemeljena ter dokumentirana.
+
+**Vloga AI:** Pri generiranju nove kode ali funkcionalnosti mora AI najprej analizirati obstoječo kodno bazo (relevantne datoteke, komponente, storitve), da razume in **dosledno replicira** uveljavljene vzorce, poimenovanja, stile in arhitekturne odločitve.
+
+---
+
+## 2. Konsistentnost Kode (Code Consistency)
+
+### 2.1. Formatiranje in Stil Kode
+* **Orodja:** Uporaba **ESLint** in **Prettier** je obvezna za samodejno formatiranje kode in uveljavljanje stilskih pravil.
+* **Konfiguracija:** Pravila so definirana v konfiguracijskih datotekah `.eslintrc.js` (ali `.json`) in `.prettierrc.js` (ali `.json`) v korenu projekta. Te datoteke so **edini vir resnice** za formatiranje in osnovna pravila lintanja.
+* **Proces:** Pred vsakim commitom je treba pognati ESLint in Prettier (lahko avtomatizirano z Git hooks - npr. husky + lint-staged), da se zagotovi skladnost kode.
+
+### 2.2. Poimenovanje (Naming Conventions)
+* **Komponente (React Native):** `PascalCase` (npr. `ChatBubble.tsx`, `UserProfileScreen.tsx`). Imena naj bodo opisna glede na funkcijo komponente.
+* **Datoteke (ne-komponente):** `kebab-case` (npr. `auth-service.ts`, `use-session-data.ts`, `constants.ts`).
+* **Spremenljivke in Funkcije:** `camelCase` (npr. `isLoading`, `currentUserProfile`, `WorkspaceMessages`, `handleLogin`). Imena naj jasno odražajo namen.
+* **Konstante:** `UPPER_SNAKE_CASE` (npr. `API_TIMEOUT`, `DEFAULT_SESSION_DURATION`).
+* **Tipi in Vmesniki (TypeScript):** `PascalCase` (npr. `UserProfile`, `Message`, `SessionStatus`).
+* **Imena Map:** `kebab-case` (npr. `components`, `screens`, `services`, `utils`).
+* **Supabase Tabele/Stolpci:** `snake_case` (kot definirano v `database_schema.md`, npr. `user_id`, `session_overview_summary`).
+
+### 2.3. TypeScript Uporaba
+* **Stroga Tipizacija:** Izkoristi prednosti TypeScripta. Uporabljaj eksplicitne tipe, kjer je to smiselno. Izogibaj se uporabi `any`, razen če je nujno potrebno in utemeljeno.
+* **Vmesniki (Interfaces) vs Tipi (Types):** Uporabljaj vmesnike (`interface`) za definiranje oblik objektov in tipov (`type`) za unije, preseke ali preprostejše tipe. Bodi konsistenten v izbiri.
+* **Jasnost Tipov:** Tipi naj bodo dobro poimenovani in po možnosti definirani blizu njihove uporabe ali v centraliziranih `types.ts` datotekah znotraj modulov/funkcionalnosti.
+
+---
+
+## 3. Konsistentnost Uporabniškega Vmesnika (UI/UX Consistency)
+
+### 3.1. Vizualni Stil in Oblikovanje
+* **Obvezujoča Pravila:** Vsa implementacija UI **mora** striktno slediti pravilom, definiranim v dokumentu **`styling-rules.mdc`**.
+* **Ključni Elementi:** Dosledna uporaba definirane barvne palete (temno moder gradient, glassy poudarki, glow efekti), tipografskega sistema (sistemska pisava, 4 velikosti, 2 debelini), 8pt grid sistema za razmike in postavitve ter načel glassmorphism-a za komponente.
+* **NativeWind:** Uporabljaj pred-definirane vrednosti (barve, razmiki, velikosti pisav) iz `tailwind.config.js` za zagotavljanje konsistence in lažje globalne spremembe. Izogibaj se "magic numbers" ali ad-hoc stilom neposredno v komponentah, razen če je nujno.
+
+### 3.2. Uporaba Komponent
+* **Ponovna Uporaba:** **Preden ustvariš novo komponento, preveri, ali že obstaja podobna v mapi `components/`.** Maksimiziraj ponovno uporabo za zagotavljanje vizualne in funkcionalne konsistence.
+* **Struktura Komponent:** Reusable komponente naj bodo čim bolj "neumne" (stateless), prejemajo naj podatke in funkcije preko props. Logika naj bo ločena v hookih ali starševskih komponentah/zaslonih.
+* **Props:** Props komponent naj bodo jasno definirani z uporabo TypeScript vmesnikov. Uporabljaj opisna imena za props.
+
+### 3.3. Navigacija
+* **Expo Router:** Vsa navigacija med zasloni mora potekati preko Expo Routerja.
+* **Vzorec:** Uporabljaj standardne vzorce za navigacijo (npr. `router.push('/profile')`, `router.back()`).
+* **Gumb Nazaj:** Skoraj vsi zasloni (razen osnovnih kot sta Welcome/Main) morajo imeti konsistentno postavljen in oblikovan gumb za nazaj.
+
+---
+
+## 4. Konsistentnost Arhitekture in Logike
+
+### 4.1. Struktura Projekta
+* **Obvezujoča Pravila:** Struktura map in datotek **mora** slediti pravilom, ki bodo definirana v dokumentu **`project-structure-rules.md`** (ko bo projekt ustvarjen). Do takrat sledi predlagani osnovni strukturi iz Implementation Plana (`app/`, `components/`, `services/` itd.).
+* **Namen:** Jasna in logična struktura olajša iskanje kode, razumevanje delovanja aplikacije in sodelovanje.
+
+### 4.2. Upravljanje Stanja (State Management)
+* **MVP Pristop:** Uporabljaj `useState` za lokalno stanje znotraj komponent. Za deljenje enostavnega globalnega stanja (npr. status avtentikacije, osnovni podatki o uporabniku) uporabi React `useContext`.
+* **Konsistentnost:** Definiraj contexte in providerje na logičnih mestih (npr. na vrhu aplikacije za globalni kontekst). Izogibaj se pretirani uporabi Contexta za stanje, ki ni zares globalno.
+
+### 4.3. API Klici (Supabase & Gemini)
+* **Abstrakcija:** Vsi klici na Supabase (DB, Auth, Edge Functions) in posredno na Gemini morajo biti enkapsulirani znotraj namenskih **storitvenih funkcij (service functions)**, lociranih npr. v mapi `services/`.
+* **Primer:** Namesto direktnega `supabase.from('messages').select()` v komponenti, ustvari funkcijo `WorkspaceMessagesForSession(sessionId)` v `services/session.ts`, ki izvede klic, in kliči to funkcijo iz komponente/hooka.
+* **Namen:** Ločevanje logike, lažje testiranje, enostavnejša zamenjava ali posodobitev API klicev.
+
+### 4.4. Obravnava Napak (Error Handling)
+* **Asinhroni Klici:** Vse asinhrono klice (API klici, Supabase operacije) obvezno ovij v `try...catch` bloke.
+* **Logiranje:** Napake dosledno logiraj z uporabo Sentry v produkciji (in `console.error` med razvojem). Log naj vsebuje dovolj konteksta za debugiranje.
+* **Uporabniški Vmesnik:** Uporabniku prikaži **prijazna sporočila o napakah** (ne surovih napak) z uporabo standardiziranega načina (npr. toast obvestilo, modalno okno). Sporočilo naj pojasni težavo in po možnosti predlaga rešitev ali "Poskusi znova".
+
+### 4.5. Logiranje (Logging) - 
+* **Centralizacija:** **Vsa sporočila (debug, info, warn, error) se morajo logirati izključno preko centralnega `Logger` modula**, ki obstaja ločeno za Expo/RN okolje (`utils/logger.ts`) in za Supabase Edge Functions (`_shared/logger.ts`).
+* **Okoljska Odvisnost:**
+    * `Logger` modul **mora** preveriti okoljsko spremenljivko (npr. `APP_ENV`, `NODE_ENV`).
+    * **Če je okolje produkcijsko (`PROD=true` oz. ekvivalent):** Kliči ustrezne Sentry funkcije (`Sentry.captureMessage`, `Sentry.captureException`) za pošiljanje logov in napak v Sentry dashboard.
+    * **Če je okolje razvojno/debug (`PROD=false` oz. ekvivalent):** Uporabi `console.log`, `console.warn`, `console.error` za prikaz logov v konzoli razvijalca.
+* **Uporaba Funkcij Loggerja:** Uporabljaj specifične funkcije loggerja (`log.debug()`, `log.info()`, `log.warn()`, `log.error()`) za ustrezno raven in kasnejše filtriranje.
+* **Občutljivi Podatki:** **Strogo prepovedano logiranje občutljivih uporabniških podatkov** (gesla, vsebina sporočil, osebni identifikatorji itd.). Logi naj vsebujejo dovolj konteksta za debugiranje, a ne osebnih podatkov.
+* **Sentry:** Primarno orodje za sledenje napakam v produkciji.
+
+---
+
+## 5. Konsistentnost Dokumentacije in Procesa
+
+### 5.1. Komentarji v Kodi
+* **Format:** Uporabljaj JSDoc/TSDoc format za komentiranje funkcij, komponent, tipov in kompleksnejših algoritmov.
+* **Vsebina:** Komentarji naj pojasnjujejo *zakaj* nekaj obstaja ali deluje na določen način, ne samo *kaj* počne (to naj bo razvidno iz kode same). Naj bodo jedrnati in ažurni.
+
+### 5.2. Projektna Dokumentacija (Markdown)
+* **Ažurnost:** Vsi Markdown dokumenti (App Flow, Tech Stack, Database Schema, PRD, Rules itd.) morajo biti **ažurni** in odražati trenutno stanje načrta/implementacije.
+* **Povezovanje:** Kjer je smiselno, **dodaj reference ali povezave med dokumenti**, da olajšaš navigacijo in razumevanje celote (npr. PRD omenja detajle v Memory Doc). [ref: User Request]
+* **Implementation Plan:** `implementation-plan.md` se mora **redno posodabljati** z odkljukanjem opravljenih nalog. Služi kot primarno orodje za sledenje napredku MVP-ja. [ref: User Request]
+
+### 5.3. Git Commit Sporočila
+* **Format:** Uporabljaj standardiziran format, kot je **Conventional Commits** (@https://www.conventionalcommits.org/).
+    * **Primeri:** `feat: add session history screen`, `fix: correct RLS policy for profiles`, `docs: update database schema with indexes`, `style: apply glassy effect to chat bubbles`, `refactor: extract api call to service function`, `chore: configure eslint`.
+* **Namen:** Omogoča lažje sledenje spremembam, avtomatsko generiranje changelog-ov in boljše razumevanje zgodovine projekta.

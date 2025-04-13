@@ -1,0 +1,37 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**automatical todo box check out**
+
+**Namen:** Zagotoviti ažurnost dokumenta `implementation-plan.md` in zmanjšati potrebo po ročnem sledenju napredku za naloge, ki jih opravi AI asistent.
+
+---
+
+## Definicija Pravila
+
+**Obveznost:**
+
+1.  **Po Uspešni Izvedbi Naloge:** Kadar AI asistent (Gemini) na zahtevo uporabnika uspešno zaključi implementacijo (npr. generira kodo, konfiguracijo ali dokumentacijo), ki **neposredno ustreza** specifični nalogi, definirani kot vrstica z okencem `[ ]` v datoteki `implementation-plan.md`.
+2.  **Samodejno Posodabljanje:** AI asistent **mora takoj po potrditvi uspešne izvedbe naloge samodejno posodobiti** ustrezno vrstico v datoteki `implementation-plan.md`.
+3.  **Dejanje Posodobitve:** Posodobitev pomeni **spremembo statusa naloge iz `[ ]` (neopravljeno) v `[x]` (opravljeno)** znotraj Markdown datoteke.
+
+## Primer Delovanja
+
+1.  **Uporabnikova Zahteva:** "Implementiraj `Welcome Screen` UI."
+2.  **AI Izvedba:** AI (Gemini) generira ustrezno React Native kodo za `Welcome Screen`.
+3.  **AI Posodobitev Plana (Avtomatsko):** AI najde vrstico v `implementation-plan.md`, ki se glasi:
+    ```markdown
+    * [ ] Implementiraj `Welcome Screen` z gumbi za prijavo/registracijo.
+    ```
+    In jo **samodejno spremeni** v:
+    ```markdown
+    * [x] Implementiraj `Welcome Screen` z gumbi za prijavo/registracijo.
+    ```
+
+## Opombe
+
+* To pravilo velja specifično za **AI asistenta (tisti ki spreminja kodo - Agent)** med procesom razvoja, ki ga simulirava.
+* Če AI ni prepričan, kateri nalogi ustreza opravljeno delo, ali če je delo le delno opravljeno, naj **ne** posodobi načrta in naj o tem **obvesti** uporabnika.
+* Uporabnik je še vedno odgovoren za pregled in morebitno ročno posodabljanje načrta za naloge, ki jih opravi sam, ali za popravke statusa.

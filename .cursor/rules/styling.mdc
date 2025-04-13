@@ -1,0 +1,133 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**rules for Styling, UI & UX**
+
+## 1. Uvod in Filozofija
+
+**Namen:** Ta dokument definira temeljna pravila in smernice za vizualno podobo, uporabniško izkušnjo (UX) in uporabniški vmesnik (UI) aplikacije Inner. Namenjen je zagotavljanju konsistentnosti, kakovosti in želenega občutka skozi celotno aplikacijo.
+
+**Filozofija:** Oblikovanje Inner sledi načelom minimalizma, jasnosti in elegance. Ustvariti želimo **pomirjujoče, varno in zaupanja vredno digitalno okolje**, ki spodbuja introspekcijo in odprto komunikacijo. Videz naj bo moderen, tehnološko napreden ("glassy", "glowing"), a hkrati nevsiljiv in intuitiven, s poudarkom na Applovi estetiki kakovosti.
+
+**Uporaba Pravil:** Ta dokument je živa referenca. Vsa implementacija UI/UX mora slediti tem pravilom. Konsistentnost je ključna.
+
+---
+
+## 2. Temeljna Estetika in Občutek (Core Aesthetic & Mood)
+
+* **Splošna Estetika:** Minimalistična, "steklena" (glassy/frosted glass), čista, elegantna, podobna Applovemu dizajnu. [ref: User Request]
+* **Vzdušje (Mood):** Terapevtsko, pomirjujoče, varno, zasebno, spodbudno, kot "sproščen deževen poletni dan". [ref: User Request]
+* **Osnovno Načelo:** Jasnost in funkcionalnost imata prednost pred nepotrebno bleščavostjo. [cite: 1]
+
+---
+
+## 3. Barvna Paleta (Color Palette)
+
+* **Primarno Ozadje (Default Dark Mode):** Temno moder linearni gradient od zgoraj navzdol. Uporablja se kot ozadje večine zaslonov.
+    * Zgoraj: `#0F1726`
+    * Sredina: `#1A2B4E`
+    * Spodaj: `#1A2D52`
+    ```javascript
+    // Primer (konceptualno za NativeWind/CSS):
+    // bg-gradient-to-b from-[#0F1726] via-[#1A2B4E] to-[#1A2D52]
+    ```
+* **Barve Elementov (Accent & Container Colors):**
+    * **Kontejnerji/Kartice:** Temno modri odtenki z efekti prosojnosti/stekla (glej sekcijo "Glassmorphism"). Lahko uporabimo npr. `#1E2F50` z različnimi stopnjami prosojnosti ali rahlim blur efektom.
+    * **Primarna Poudarjena Barva (Accent):** Svetlejši, a še vedno umirjen moder odtenek (npr. `#3498DB` ali podoben) za primarne gumbe, aktivne elemente, morda povezave. Ta barva se uporablja tudi za "glow" efekt.
+    * **Sekundarne Barve:** Odtenki sive in bele za besedila, ikone in meje, da se zagotovi dober kontrast na temnem ozadju (npr. `#E3E7F4` za glavno besedilo, temnejše sive za manj pomembne informacije).
+* **Pravilo Barv (Prilagojeno 60/30/10 za Dark Mode)[cite: 2]:**
+    * **~60% Glavno Ozadje:** Temno modri gradient.
+    * **~30% Kontejnerji/Sekundarno Ozadje:** Stekleni temno modri elementi (npr. kartice, input polja, chat oblački).
+    * **~10% Poudarki (Accent):** Svetlo modra za aktivne elemente, gumbe, poudarke in "glow" efekte. Bela/Svetlo siva za besedila in ikone.
+
+---
+
+## 4. Tipografija (Typography)
+
+* **Pisava:** Uporaba **privzete sistemske pisave** platforme za domačnost in optimalno berljivost (San Francisco za iOS, Roboto za Android). Expo bo to večinoma upravljal samodejno.
+* **Sistem Velikosti in Debelin (Po principu 4 Sizes, 2 Weights)[cite: 3]:** Strogo se držimo omejenega nabora velikosti in debelin za zagotavljanje jasne vizualne hierarhije.
+    * **Debelini:**
+        * **Semibold (ali Medium):** Za naslove (zaslonov, sekcij), poudarjeno besedilo, gumbe.
+        * **Regular:** Za glavno besedilo (v klepetu, modulih), opise, labele.
+    * **Velikosti (Primeri namembnosti - točne vrednosti v pt/sp določiti med implementacijo):**
+        * **Velikost 1 (Največja):** Glavni naslovi zaslonov (npr. "Settings", "Profile").
+        * **Velikost 2 (Srednja):** Podnaslovi, naslovi sekcij (npr. "Modules" na Main Screen), pomembnejša sporočila.
+        * **Velikost 3 (Osnovna):** Glavno besedilo v modulih, sporočila v klepetu, tekst v input poljih.
+        * **Velikost 4 (Najmanjša):** Časovni žigi sporočil, manj pomembne opombe, labele.
+* **Berljivost:** Zagotoviti zadosten kontrast med barvo besedila in ozadjem. Ustrezna višina vrstic (line height) za daljša besedila.
+
+---
+
+## 5. Postavitev in Razmiki (Layout & Spacing)
+
+* **Mrežni Sistem (Grid System): 8pt Grid System** [cite: 2]
+    * **Pravilo:** Vse vrednosti za `margin`, `padding` in po možnosti dimenzije elementov morajo biti **deljive z 8 ali vsaj s 4**.
+    * **Primeri:** Namesto `padding: 10px` uporabi `padding: 8px`. Namesto `margin: 15px` uporabi `margin: 16px`. Namesto `width: 101px` uporabi `width: 104px` ali `width: 96px`.
+    * **Namen:** Ustvarja vizualni ritem, harmonijo in konsistentnost v postavitvi. NativeWind omogoča enostavno uporabo tega sistema (npr. `p-2` = 8px, `p-4` = 16px, `m-3` = 12px).
+* **Čista Vizualna Struktura (Clean Visual Structure)[cite: 1]:**
+    * **Logično Grupiranje:** Elementi, ki sodijo skupaj, morajo biti vizualno povezani (bližje skupaj).
+    * **Premišljeni Razmiki:** Uporaba praznega prostora za ločevanje sekcij in izboljšanje berljivosti. Razmiki sledijo 8pt gridu.
+    * **Poravnava:** Vsi elementi morajo biti skrbno poravnani znotraj svojih kontejnerjev in glede na druge elemente (levo, desno, sredinsko). NativeWind flexbox/grid utility klasi to olajšajo.
+
+---
+
+## 6. Oblikovanje Komponent (Component Styling)
+
+* **Glassmorphism ("Stekleni" Efekt):**
+    * Uporablja se za glavne kontejnerje, kartice modulov, chat oblačke.
+    * **Implementacija:** Doseže se s kombinacijo:
+        * Pol-prosojnega ozadja (npr. temno modra barva z alfa vrednostjo, npr. `rgba(30, 47, 80, 0.5)`).
+        * Efekta zameglitve ozadja (Background Blur), če je podprto in zmogljivostno sprejemljivo (npr. preko Expo BlurView).
+        * Tankega, svetlega roba (npr. 1px bela z nizko prosojnostjo, npr. `rgba(255, 255, 255, 0.1)`).
+        * (Opcijsko) Dodajanje subtilnega šuma (noise texture) ozadju elementa za bolj realističen videz stekla.
+* **Glow Efekti ("Sijaj"):**
+    * Uporablja se za **poudarjanje pomembnih interaktivnih elementov**, kot so primarni gumbi ("Start New Session").
+    * **Implementacija:** Doseže se z uporabo senc (`shadow`):
+        * Barva sence naj bo svetlejši moder odtenek (npr. `#3498DB` ali podoben), ki se uporablja kot poudarjena barva.
+        * Nastavi ustrezen `shadowOpacity`, `shadowRadius` (npr. 10-15px za mehek sij) in `shadowOffset` (običajno `(0, 0)`).
+        * Efekt naj bo subtilen, ne premočan.
+* **Specifični Elementi:**
+    * **Gumbi (Pomembni):** Uporabljajo glow efekt. Jasno označeni, z dovolj velikim območjem za dotik.
+    * **Chat Oblački:** Glassy efekt. Dovolj kontrasta med besedilom in ozadjem oblačka. Različne barve/poravnave za uporabnika in AI.
+    * **Module Kartice:** Frosted glass kontejnerji. Vsebujejo naslov in morda majhno sliko/ikonco.
+    * **Navigacijski Elementi:** Minimalistični (npr. ikone za History/Profile), intuitivno postavljeni.
+    * **Vnosna Polja (Input Fields):** Čist dizajn, glassy ozadje, jasen placeholder tekst, dober kontrast besedila.
+
+---
+
+## 7. Animacije in Tranzicije (Animations & Transitions)
+
+* **Načelo:** Animacije naj bodo **subtilne, tekoče in smiselne**. Njihov namen je izboljšati UX, ne pa motiti uporabnika.
+* **Tranzicije Med Zasloni:** Uporaba privzetih ali rahlo prilagojenih tranzicij, ki jih nudi Expo Router (npr. fade, slide), za gladek občutek.
+* **Mikro-Interakcije:** Subtilne animacije ob pritisku gumbov, nalaganju podatkov (npr. nežen fade-in), morda prikazu novih sporočil.
+* **Implementacija:** Uporaba knjižnic kot sta `react-native-reanimated` ali `moti` za bolj kompleksne ali performantne animacije, če je potrebno.
+
+---
+
+## 8. Konsistentnost (Consistency)
+
+* **Nujnost:** Konsistentnost v dizajnu (barve, tipografija, razmiki, komponente) je ključna za profesionalen videz in intuitivno uporabo.
+* **Kako Doseči:**
+    * **Uporaba NativeWind:** Strogo upoštevanje utility razredov in definiranih barv/razmikov v konfiguraciji NativeWind (`tailwind.config.js`).
+    * **Reusable Komponente:** Ustvarjanje in dosledna uporaba komponent za ponavljajoče se elemente (npr. `GlassCard`, `GlowingButton`, `StyledTextInput`).
+    * **Upoštevanje Teh Pravil:** Vsa nova implementacija UI mora slediti tem smernicam.
+
+---
+
+## 9. Dostopnost (Accessibility)
+
+* **Osnovno Načelo:** Aplikacija naj bo uporabna za čim širši krog ljudi.
+* **MVP Fokus:**
+    * Zagotoviti **dober barvni kontrast** med besedilom in ozadjem.
+    * Uporabiti **smiselne oznake (accessibility labels)** za interaktivne elemente za podporo bralnikom zaslona (npr. VoiceOver, TalkBack).
+    * Zagotoviti dovolj **velika območja za dotik** (tap targets).
+* **(Kasnejše Faze):** Podrobnejša implementacija in testiranje dostopnosti.
+
+---
+
+## 10. Procesna Pravila (Dodatno)
+
+* **Posodabljanje Implementation Plana:** Med razvojem redno odkljukaj opravljene naloge v `@implementation-plan.md` dokumentu. [ref: User Request]
+* **Povezovanje Dokumentacije:** Kjer je smiselno, dodaj reference med različnimi dokumenti (npr. PRD omenja Memory Doc, ta dokument omenja Tech Stack za implementacijo). 
