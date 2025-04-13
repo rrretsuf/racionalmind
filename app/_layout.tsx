@@ -6,13 +6,21 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import "../global.css"; 
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+import * as Sentry from '@sentry/react-native';
+
+
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN_RN,
+  debug: process.env.EXPO_PUBLIC_APP_ENV === 'debug',
+  environment: process.env.EXPO_PUBLIC_APP_ENV || 'development',
+  tracesSampleRate: 1.0,
+});
+
+function RootLayoutNav() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -28,12 +36,16 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {/* Define your stack screens here later */}
+        {/* Example: <Stack.Screen name="(main)" options={{ headerShown: false }} /> */}
+        {/* Example: <Stack.Screen name="(auth)" options={{ headerShown: false }} /> */}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
 }
+
+export default Sentry.wrap(RootLayoutNav);

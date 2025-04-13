@@ -1,0 +1,61 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+/inner (Root Workspace)
+├── .cursor/
+│   ├── docs/
+│   │   ├── mvp/            # Documentation for MVP (app-flow, database, memory, requirements, tech-stack etc.)
+│   └── plans/
+│       └── mvp/            # Implementation plan for MVP
+│   └── rules/
+│       └── ...             # Custom rules for AI interaction (project-structure-map, consistency, styling, auto-check etc.)
+├── app/                     # Expo Router: File-based routing
+│   ├── (auth)/              # Screens/modals related to authentication (e.g., Welcome, Login, Signup)
+│   ├── (onboarding)/        # Screens for the initial user onboarding flow
+│   ├── (main)/              # Main application screens group after authentication
+│   │   ├── _layout.tsx      # Layout for the main app section (e.g., tabs, stacks)
+│   │   ├── index.tsx        # Main dashboard/home screen
+│   │   └── ...              # Other main screens (history, profile, session, settings, module details)
+│   ├── _layout.tsx          # Root layout component (providers, global setup)
+│   └── index.tsx            # Initial route, likely handles auth state redirection
+├── assets/
+│   ├── fonts/               # Custom fonts, if used
+│   └── images/              # Image assets (icons, logos, splash screen etc.)
+├── components/              # Reusable UI components (e.g., Button, Card, ChatBubble, Input)
+├── constants/
+│   ├── style/               # Style-related constants (e.g., colors.ts, spacing.ts, themes.ts)
+│   └── text/                # Text-related constants (e.g., uiLabels.ts, messages.ts - consider i18n later)
+├── contexts/
+│   └── AuthContext.tsx      # Example: Context for authentication state management
+├── hooks/
+│   └── useAuthentication.ts # Example: Custom hook for managing authentication logic
+├── services/                # API interaction layer (calling Supabase Edge Functions, Auth)
+│   ├── auth.ts              # Authentication service functions
+│   └── ...                  # Other services (modules, profile, session API calls)
+├── supabase/                # Supabase specific files (backend)
+│   ├── functions/           # Supabase Edge Functions (Deno/TypeScript)
+│   │   ├── _shared/         # Shared utilities for Edge Functions (e.g., logger.ts, supabaseClient.ts, types.ts)
+│   │   ├── gemini-chat/     # Function handling real-time chat, context assembly, RAG
+│   │   │   └── index.ts
+│   │   ├── process-session-end/ # Function handling post-session processing (summary, notes, profile update)
+│   │   │   └── index.ts
+│   │   ├── generate-embeddings/ # Dedicated function for embedding generation (if needed separately)
+│   │   │   └── index.ts
+│   │   └── rag-search/      # Dedicated function for RAG searches (if needed separately)
+│   │       └── index.ts
+│   └── config.toml          # Supabase CLI configuration
+├── utils/                   # Frontend utility functions and modules
+│   ├── logger.ts            # Centralized frontend logging utility
+│   ├── navigation.ts        # Example: Navigation specific helpers (if needed)
+│   └── supabaseClient.ts    # Example: Supabase client initialization (for frontend use)
+│   └── ...     
+├── .env                     # Environment variables - **MUST BE IN .gitignore**
+├── .gitignore               # Specifies intentionally untracked files
+├── app.json                 # Expo configuration file
+├── babel.config.js          # Babel configuration
+├── metro.config.js          # Metro bundler configuration
+├── package.json             # Project dependencies and scripts
+├── tailwind.config.js       # NativeWind configuration file 
+└── tsconfig.json            # TypeScript configuration

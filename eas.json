@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 7.6.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "bundleIdentifier": "com.inner.innersport"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "bundleIdentifier": "com.inner.innersport"
+      }
+    },
+    "production": {
+      "distribution": "store",
+      "ios": {
+        "bundleIdentifier": "com.inner.innersport",
+        "buildConfiguration": "Release"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
