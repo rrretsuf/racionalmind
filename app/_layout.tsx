@@ -6,7 +6,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import "../global.css"; 
+import "../global.css";
+import { AuthProvider } from '../hooks/useAuth'
 
 import * as Sentry from '@sentry/react-native';
 
@@ -36,15 +37,14 @@ function RootLayoutNav() {
   }
 
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <Stack>
-        {/* Define your stack screens here later */}
-        {/* Example: <Stack.Screen name="(main)" options={{ headerShown: false }} /> */}
-        {/* Example: <Stack.Screen name="(auth)" options={{ headerShown: false }} /> */}
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

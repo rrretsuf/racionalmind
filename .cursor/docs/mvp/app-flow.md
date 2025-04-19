@@ -92,12 +92,16 @@ Ta dokument je zemljevid MVP verzije aplikacije Inner. Podrobno opisuje vsak zas
 
 * **Namen:** Omogočiti uporabniku pregled preteklih zaključenih seans in dostop do njihove vsebine (samo za branje).
 * **Vstop:** Ko uporabnik pritisne ikono Zgodovine na `Main Screen`.
-* **Struktura:** Zaslon prikazuje seznam vseh uporabnikovih preteklih seans. Vsaka seansa je predstavljena v svoji vrstici.
-    * Vsaka vrstica vsebuje: Datum seanse, kratek AI generiran povzetek (izvleček iz Journey Doc Notes) in morda glavno temo ali ime seanse.
+* **Struktura:** Zaslon prikazuje seznam vseh uporabnikovih preteklih seans. Vsaka seansa je predstavljena v svoji vrstici ali kartici, oblikovani v skladu s splošno estetiko aplikacije.
+    * Vsaka vrstica vsebuje:
+        * Na levi strani: Datum (ali čas, če je bil zaključen danes), kdaj se je seansa končala.
+        * Osrednji del: Kratek AI generiran povzetek ali naslov seanse (izvleček iz Journey Doc Notes).
+        * Na desni strani: Vizualni indikator statusa seanse:
+            * **Active:** Če je seansa zadnja in še vedno aktivna (ni bila ročno zaključena ali časovno omejena). Indikator je subtilno zelene barve, ki izstopa ravno dovolj, da je opazen, a ne moteč. Vključuje tudi elegantno ikono, ki odraža aktivnost in se sklada s temo aplikacije (npr. stiliziran pulzirajoč krog ali podobno), prav tako oblikovano, da ne izstopa preveč.
+            * **Finished:** Če je seansa zaključena. Indikator je nevtralne (npr. sive) barve. Vključuje ikono, ki simbolizira zaključek (npr. stilizirana kljukica ali pika) in se lepo vklaplja v celoten dizajn, ne da bi pritegnila preveč pozornosti.
 * **Interakcije:**
     * **Ogled Seanse:** Uporabnik lahko pritisne na vrstico:
-        * Če je izbrana seansa **zaključena**: Odpre se nov zaslon, ki prikaže celotno zgodovino klepeta te seanse v načinu samo za branje.
-        * Če je izbrana seansa **zadnja in še vedno aktivna/odprta** (ni bila ročno zaključena in ni presegla časovne omejitve): Uporabnik je preusmerjen nazaj na `Session Screen`, kjer lahko nadaljuje to aktivno seanso.
+        * Če je status seanse **Finished**: Odpre se nov zaslon, ki prikaže celotno zgodovino klepeta te seanse v načinu samo za branje.
     * **Brisanje Seanse:** Uporabnik lahko izbriše seanso s pritiskom na opcijo za brisanje v vrstici (npr. ikona smetnjaka ali swipe-to-delete funkcionalnost).
     * **MVP Omejitev:** Možnost pripenjanja (pinning) seans **ni** del MVP-ja.
 * **Občutek:** Zaslon je preprost in funkcionalen, podoben zgodovinskim zaslonom v drugih AI klepetalnih aplikacijah.

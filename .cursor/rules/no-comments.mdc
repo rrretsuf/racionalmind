@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+**NEVER INCLUDE COMMENTS IN GENERATED CODE**
+
+When generating or outputting code, do not include any comments. This applies to single-line and multi-line comments across all languages. Provide plain, functional code only, without explanations, annotations, or descriptive text embedded in it.
