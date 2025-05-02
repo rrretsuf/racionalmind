@@ -1,47 +1,86 @@
 import React from 'react'
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ImageBackground } from 'react-native'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import StartSessionButton from '../../components/StartSessionButton';
+import ModuleCard from '../../components/ModuleCard';
+
 
 export default function Home() {
   const router = useRouter()
 
+  const userName = "Filip"
+
   return (
-    <SafeAreaView className="flex-1 bg-[#0F1726] p-4">
-      <View className="flex-row justify-between items-center mb-6">
-        <Text className="text-2xl font-semibold text-white">Welcome Back!</Text>
-        {/* Placeholder for icons */}
-        <View className="flex-row space-x-4">
-          <TouchableOpacity onPress={() => router.push('./history')}>
-            <Text className="text-white text-lg">History {/* Replace with Icon later */}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push('./profile')}>
-            <Text className="text-white text-lg">Profile {/* Replace with Icon later */}</Text>
-          </TouchableOpacity>
+    <ImageBackground
+      source={require('../../assets/images/background-home.png')}
+      className="flex-1"
+      resizeMode="cover"
+    >
+      <SafeAreaView className="flex-1 p-6">
+        {/* Header */}
+        <View className="flex-row justify-end items-center mb-24">
+          <View className="flex-row space-x-4">
+            <TouchableOpacity
+              onPress={() => router.push('/(main)/history')}
+              className="w-10 h-10 rounded-full bg-button-secondary-bg border border-component-border items-center justify-center mr-1"
+              accessibilityLabel="View History"
+            >
+              {/* <ClockIcon size={24} color="#FFFFFF" /> */}
+              <Text className="text-primary text-sm">H</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push('/(main)/profile')}
+              className="w-10 h-10 rounded-full bg-button-secondary-bg border border-component-border items-center justify-center ml-1"
+              accessibilityLabel="View Profile"
+            >
+              {/* <UserCircleIcon size={24} color="#FFFFFF" /> */}
+               <Text className="text-primary text-sm">P</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <TouchableOpacity
-        className="bg-blue-600 rounded-lg p-4 mb-6 items-center"
-        onPress={() => router.push('./session')}
-      >
-        <Text className="text-white font-semibold text-lg">Start New Session</Text>
-      </TouchableOpacity>
 
-      <Text className="text-xl font-semibold text-white mb-3">Modules</Text>
-      <ScrollView>
-        {/* Placeholder Modules */}
-        <View className="bg-gray-700 p-4 rounded-lg mb-3">
-          <Text className="text-white">Module 1 Placeholder</Text>
+        {/* Greeting */}
+        <View className="mb-24">
+          <Text className="text-h2 text-primary font-medium">
+            Good Morning {userName}
+          </Text>
+          <Text className="text-h2 text-secondary font-medium">
+            How are you feeling today?
+          </Text>
         </View>
-        <View className="bg-gray-700 p-4 rounded-lg mb-3">
-          <Text className="text-white">Module 2 Placeholder</Text>
+
+
+        {/* Start Session Button - Replace with component */}
+        <StartSessionButton
+          onPress={() => router.push('/(main)/session')}
+          style={{ marginBottom: 60 }}
+        />
+
+
+        {/* Spacer to push modules down */}
+        <View className="flex-1" />
+
+
+        {/* Modules Section */}
+        <View className="pb-16">
+          <Text className="text-h3 text-primary font-medium mb-4">Modules</Text>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            className="flex-grow -mx-6 px-6"
+          >
+            <ModuleCard />
+            <ModuleCard />
+            <ModuleCard />
+            <ModuleCard />
+          </ScrollView>
         </View>
-        <View className="bg-gray-700 p-4 rounded-lg mb-3">
-          <Text className="text-white">Module 3 Placeholder</Text>
-        </View>
-        {/* Add more later */}
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ImageBackground>
   )
 }
+
+
+

@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -26,11 +26,13 @@ function RootLayoutNav() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
 
   if (!loaded) {
     return null;
@@ -39,7 +41,9 @@ function RootLayoutNav() {
   return (
     <AuthProvider>
       <ThemeProvider value={DefaultTheme}>
-        <Stack>
+        <Stack screenOptions={{ headerShown: false , animation: 'none'}}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(main)" />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
@@ -49,3 +53,4 @@ function RootLayoutNav() {
 }
 
 export default Sentry.wrap(RootLayoutNav);
+
