@@ -26,37 +26,45 @@ alwaysApply: true
 ## 3. Barvna Paleta (Color Palette)
 
 * **Primarno Ozadje (Default Dark Mode):** Temno moder linearni gradient od zgoraj navzdol. Uporablja se kot ozadje večine zaslonov.
-    * Zgoraj: `#0F1726`
-    * Sredina: `#1A2B4E`
-    * Spodaj: `#1A2D52`
-    ```javascript
-    // Primer (konceptualno za NativeWind/CSS):
-    // bg-gradient-to-b from-[#0F1726] via-[#1A2B4E] to-[#1A2D52]
-    ```
-* **Barve Elementov (Accent & Container Colors):**
-    * **Kontejnerji/Kartice:** Temno modri odtenki z efekti prosojnosti/stekla (glej sekcijo "Glassmorphism"). Lahko uporabimo npr. `#1E2F50` z različnimi stopnjami prosojnosti ali rahlim blur efektom.
-    * **Primarna Poudarjena Barva (Accent):** Svetlejši, a še vedno umirjen moder odtenek (npr. `#3498DB` ali podoben) za primarne gumbe, aktivne elemente, morda povezave. Ta barva se uporablja tudi za "glow" efekt.
-    * **Sekundarne Barve:** Odtenki sive in bele za besedila, ikone in meje, da se zagotovi dober kontrast na temnem ozadju (npr. `#E3E7F4` za glavno besedilo, temnejše sive za manj pomembne informacije).
+    * *Referenca:* @tailwind.config.js ne specificira tega gradienta direktno, ampak služi kot konceptualni cilj. Implementacija bo v kodi.
+* **Barve Elementov (Core Semantic, Backgrounds, Borders, Component-Specific):**
+    * **Kontejnerji/Kartice:** Uporablja `component-bg: rgba(30, 47, 80, 0.35)`.
+    * **Vnosna Polja:** Ozadje `input-bg: #18274D`, obroba `input-border: #495C8A`.
+    * **Primarna Barva Besedila/Elementov:** `primary: #FFFFFF`.
+    * **Sekundarna Barva Besedila/Elementov:** `secondary: rgba(255, 255, 255, 0.7)`.
+    * **Placeholder Besedilo:** `placeholder: #7784A5` (temnejši), `placeholder-light: #A0AEC0` (svetlejši), `profile-placeholder: #6E7B9D`.
+    * **Obrobe Komponent:** `component-border: rgba(255, 255, 255, 0.1)`, `profile-card-border: #5E6E97`.
+    * **Specifične Komponente:**
+        * Sekundarni gumbi: `button-secondary-bg: rgba(255, 255, 255, 0.2)`.
+        * Gumbi v nastavitvah: `settings-btn-bg: rgba(61, 79, 126, 0.5)`.
+        * Gumb za odjavo: `logout-btn-bg: rgba(222, 18, 18, 0.5)`.
+    * **Poudarjena Barva (Accent/Glow):** Trenutno ni eksplicitno definirana kot `accent` v `tailwind.config.js`. Za 'glow' efekt se uporablja specifična senca (`start-session-glow`). Implicitno lahko štejemo `#3498DB` (iz `start-session-glow` definicije) kot referenčno poudarjeno barvo, če jo potrebujemo drugje.
 * **Pravilo Barv (Prilagojeno 60/30/10 za Dark Mode)[cite: 2]:**
-    * **~60% Glavno Ozadje:** Temno modri gradient.
-    * **~30% Kontejnerji/Sekundarno Ozadje:** Stekleni temno modri elementi (npr. kartice, input polja, chat oblački).
-    * **~10% Poudarki (Accent):** Svetlo modra za aktivne elemente, gumbe, poudarke in "glow" efekte. Bela/Svetlo siva za besedila in ikone.
+    * **~60% Glavno Ozadje:** Konceptualni temno modri gradient.
+    * **~30% Kontejnerji/Sekundarno Ozadje:** Elementi z `component-bg` ali `input-bg`.
+    * **~10% Poudarki (Accent):** Bela (`primary`) in svetlo siva (`secondary`) za besedila/ikone. `start-session-glow` senca za poudarjene gumbe. Ostale specifične barve (`logout-btn-bg`, itd.) po potrebi.
 
 ---
 
 ## 4. Tipografija (Typography)
 
-* **Pisava:** Uporaba **privzete sistemske pisave** platforme za domačnost in optimalno berljivost (San Francisco za iOS, Roboto za Android). Expo bo to večinoma upravljal samodejno.
-* **Sistem Velikosti in Debelin (Po principu 4 Sizes, 2 Weights)[cite: 3]:** Strogo se držimo omejenega nabora velikosti in debelin za zagotavljanje jasne vizualne hierarhije.
-    * **Debelini:**
-        * **Semibold (ali Medium):** Za naslove (zaslonov, sekcij), poudarjeno besedilo, gumbe.
-        * **Regular:** Za glavno besedilo (v klepetu, modulih), opise, labele.
-    * **Velikosti (Primeri namembnosti - točne vrednosti v pt/sp določiti med implementacijo):**
-        * **Velikost 1 (Največja):** Glavni naslovi zaslonov (npr. "Settings", "Profile").
-        * **Velikost 2 (Srednja):** Podnaslovi, naslovi sekcij (npr. "Modules" na Main Screen), pomembnejša sporočila.
-        * **Velikost 3 (Osnovna):** Glavno besedilo v modulih, sporočila v klepetu, tekst v input poljih.
-        * **Velikost 4 (Najmanjša):** Časovni žigi sporočil, manj pomembne opombe, labele.
-* **Berljivost:** Zagotoviti zadosten kontrast med barvo besedila in ozadjem. Ustrezna višina vrstic (line height) za daljša besedila.
+* **Pisava:** Uporaba **privzete sistemske pisave** platforme.
+* **Sistem Velikosti in Debelin (Definirano v `tailwind.config.js`):**
+    * **Debeline (`fontWeight`):**
+        * `light`: '300'
+        * `regular`: '400' (Za glavno besedilo)
+        * `medium`: '500'
+        * `bold`: '600' (Za naslove, poudarke)
+        * `extra-bold`: '700'
+        * *Opomba:* Prej omenjeni `Semibold` in `Regular` se mapirata na `bold` (600) in `regular` (400).
+    * **Velikosti (`fontSize`):**
+        * `title`: '56px' (lineHeight: '64px') - Glavni naslovi zaslonov
+        * `h1`: '36px' (lineHeight: '40px') - Večji podnaslovi
+        * `h2`: '28px' (lineHeight: '32px') - Srednji podnaslovi/sekcije
+        * `h3`: '22px' (lineHeight: '30px') - Manjši naslovi/pomembna sporočila
+        * `base`: '18px' (lineHeight: '24px') - Glavno besedilo (klepet, moduli)
+        * `sm`: '14px' (lineHeight: '20px') - Časovni žigi, opombe, labele
+* **Berljivost:** Zagotoviti zadosten kontrast (uporaba `primary`, `secondary` barv). Višina vrstic (`lineHeight`) je definirana skupaj z velikostjo pisave.
 
 ---
 
@@ -64,12 +72,9 @@ alwaysApply: true
 
 * **Mrežni Sistem (Grid System): 8pt Grid System** [cite: 2]
     * **Pravilo:** Vse vrednosti za `margin`, `padding` in po možnosti dimenzije elementov morajo biti **deljive z 8 ali vsaj s 4**.
-    * **Primeri:** Namesto `padding: 10px` uporabi `padding: 8px`. Namesto `margin: 15px` uporabi `margin: 16px`. Namesto `width: 101px` uporabi `width: 104px` ali `width: 96px`.
-    * **Namen:** Ustvarja vizualni ritem, harmonijo in konsistentnost v postavitvi. NativeWind omogoča enostavno uporabo tega sistema (npr. `p-2` = 8px, `p-4` = 16px, `m-3` = 12px).
+    * **Namen:** Ustvarja vizualni ritem, harmonijo in konsistentnost. NativeWind utility klasi (`p-2`, `m-4`, itd.) to omogočajo.
 * **Čista Vizualna Struktura (Clean Visual Structure)[cite: 1]:**
-    * **Logično Grupiranje:** Elementi, ki sodijo skupaj, morajo biti vizualno povezani (bližje skupaj).
-    * **Premišljeni Razmiki:** Uporaba praznega prostora za ločevanje sekcij in izboljšanje berljivosti. Razmiki sledijo 8pt gridu.
-    * **Poravnava:** Vsi elementi morajo biti skrbno poravnani znotraj svojih kontejnerjev in glede na druge elemente (levo, desno, sredinsko). NativeWind flexbox/grid utility klasi to olajšajo.
+    * Logično grupiranje, premišljeni razmiki, skrbna poravnava.
 
 ---
 
@@ -78,22 +83,22 @@ alwaysApply: true
 * **Glassmorphism ("Stekleni" Efekt):**
     * Uporablja se za glavne kontejnerje, kartice modulov, chat oblačke.
     * **Implementacija:** Doseže se s kombinacijo:
-        * Pol-prosojnega ozadja (npr. temno modra barva z alfa vrednostjo, npr. `rgba(30, 47, 80, 0.5)`).
-        * Efekta zameglitve ozadja (Background Blur), če je podprto in zmogljivostno sprejemljivo (npr. preko Expo BlurView).
-        * Tankega, svetlega roba (npr. 1px bela z nizko prosojnostjo, npr. `rgba(255, 255, 255, 0.1)`).
-        * (Opcijsko) Dodajanje subtilnega šuma (noise texture) ozadju elementa za bolj realističen videz stekla.
+        * Pol-prosojnega ozadja: Uporaba `component-bg: rgba(30, 47, 80, 0.35)`.
+        * Efekta zameglitve ozadja (Background Blur), če je podprto (npr. Expo BlurView).
+        * Tankega, svetlega roba: Uporaba `component-border: rgba(255, 255, 255, 0.1)`.
 * **Glow Efekti ("Sijaj"):**
-    * Uporablja se za **poudarjanje pomembnih interaktivnih elementov**, kot so primarni gumbi ("Start New Session").
-    * **Implementacija:** Doseže se z uporabo senc (`shadow`):
-        * Barva sence naj bo svetlejši moder odtenek (npr. `#3498DB` ali podoben), ki se uporablja kot poudarjena barva.
-        * Nastavi ustrezen `shadowOpacity`, `shadowRadius` (npr. 10-15px za mehek sij) in `shadowOffset` (običajno `(0, 0)`).
-        * Efekt naj bo subtilen, ne premočan.
+    * Uporablja se za **poudarjanje pomembnih interaktivnih elementov**.
+    * **Implementacija:** Definirana kot senca v `tailwind.config.js`:
+        * `start-session-glow: '0 0 15px 5px rgba(52, 152, 219, 0.35)'`
+* **Zaokroževanje Robov:**
+    * Standardno zaokroževanje: `borderRadius.standard: '12px'`.
+* **Ostale Sence:**
+    * Senca za gumbe pri avtentikaciji: `boxShadow['auth-button']: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'`.
 * **Specifični Elementi:**
-    * **Gumbi (Pomembni):** Uporabljajo glow efekt. Jasno označeni, z dovolj velikim območjem za dotik.
-    * **Chat Oblački:** Glassy efekt. Dovolj kontrasta med besedilom in ozadjem oblačka. Različne barve/poravnave za uporabnika in AI.
-    * **Module Kartice:** Frosted glass kontejnerji. Vsebujejo naslov in morda majhno sliko/ikonco.
-    * **Navigacijski Elementi:** Minimalistični (npr. ikone za History/Profile), intuitivno postavljeni.
-    * **Vnosna Polja (Input Fields):** Čist dizajn, glassy ozadje, jasen placeholder tekst, dober kontrast besedila.
+    * **Gumbi (Pomembni):** Uporabljajo `start-session-glow`.
+    * **Chat Oblački:** Glassy efekt (`component-bg`, `component-border`).
+    * **Module Kartice:** Glassy efekt.
+    * **Vnosna Polja (Input Fields):** Ozadje `input-bg`, obroba `input-border`, placeholder tekst (`placeholder`, `placeholder-light`), zaokroževanje `standard`.
 
 ---
 

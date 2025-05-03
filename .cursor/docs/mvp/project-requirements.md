@@ -1,4 +1,4 @@
-# Inner App - Project Requirements Document (MVP v1.0.0)
+# Rational Mind App - Project Requirements Document (MVP v1.0.0)
 
 **Verzija:** 1.0.0
 **Datum:** 12. april 2025
@@ -19,33 +19,37 @@
 ## 1. Pregled Aplikacije (App Overview)
 
 ### 1.1. Ime Aplikacije
-**Inner**
+**Rational Mind**
 
 ### 1.2. Namen Aplikacije (MVP)
-MVP aplikacije Inner zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem športniki ali posamezniki, osredotočeni na zmogljivost) komunicirajo s specializiranim **AI Športnim Psihologom/Terapevtom**. AI, ki ga poganja Gemini 2.0 Flash in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati misli, čustva in vedenja, povezana s športom in zmogljivostjo, ter spodbuja samorazumevanje in razvoj strategij za izboljšanje. MVP služi kot temelj za prihodnje razširitve.
+MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem mladi med 16. in 24. letom, ki se soočajo z overthinkanjem) komunicirajo s personaliziranim **AI Racionalnim Prijateljem**. AI, ki ga poganja Gemini 2.0 Flash in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati in obvladovati misli, ki vodijo v overthinkanje, ter spodbuja samorazumevanje in razvoj strategij za mentalno jasnost. AI se uči o uporabniku, prepoznava vzorce in prilagaja svoje odgovore, deluje kot vedno dostopen (24/7) prijatelj. Uporabniki lahko izbirajo med 3-5 AI avatarji z različnimi osebnostmi (definiranimi s sistemskimi promti). MVP služi kot temelj za prihodnje razširitve in uvedbo premium funkcij.
 
 ### 1.3. Ciljna Publika (MVP)
-* Športniki (amaterski in profesionalni), ki iščejo mentalno podporo.
-* Posamezniki, ki želijo izboljšati svojo mentalno pripravo, fokus, motivacijo ali obvladovanje stresa v kontekstu športa ali drugih področij zmogljivosti.
-* Uporabniki, ki iščejo dostopno in zasebno alternativo ali dopolnilo tradicionalni športni psihologiji.
-* Radovedneži, ki želijo raziskati svoje misli skozi prizmo športne psihologije s pomočjo AI.
+* Mladi odrasli (16-24 let), ki se pogosto znajdejo v zankah overthinkanja.
+* Posamezniki, ki iščejo orodje za samopomoč pri obvladovanju anksioznih misli, stresa ali dvomov vase.
+* Uporabniki, ki potrebujejo dostopnega, zasebnega in nevtralnega "sogovornika" za razreševanje miselnih vzorcev.
+* Radovedneži, ki želijo raziskati svoje misli s pomočjo AI v varnem okolju.
 
 ### 1.4. Ključni Cilji in Meritve Uspeha (MVP)
-* **Primarni Cilj:** Lansirati funkcionalno in stabilno osnovno verzijo aplikacije s fokusom na AI Športnega Psihologa ter validirati osnovno vrednost koncepta pri ciljni publiki.
-* **Sekundarni Cilj:** Zgraditi robusten tehnični temelj (Expo RN, Supabase, Memory/Context sistem) za prihodnje faze razvoja.
+* **Primarni Cilj:** Lansirati funkcionalno in stabilno osnovno verzijo aplikacije s fokusom na AI Racionalnega Prijatelja ter validirati osnovno vrednost koncepta pri ciljni publiki (16-24 letniki, ki overthinkajo).
+* **Sekundarni Cilj:** Zgraditi robusten tehnični temelj (Expo RN, Supabase, Memory/Context sistem, STT/TTS) za prihodnje faze razvoja in monetizacijo.
 * **Meritve Uspeha (MVP):**
     * Število aktivnih uporabnikov (MAU/DAU).
-    * Angažiranost uporabnikov (povprečen čas v aplikaciji, število začetih/zaključenih seans na uporabnika).
+    * Angažiranost uporabnikov (povprečen čas v aplikaciji, število začetih/zaključenih seans na uporabnika, uporaba glasovnih funkcij).
     * Stopnja zadržanja uporabnikov (retention rate).
-    * Kvalitativne povratne informacije uporabnikov o uporabnosti in vrednosti AI Športnega Psihologa.
+    * Kvalitativne povratne informacije uporabnikov o uporabnosti in vrednosti AI Racionalnega Prijatelja ter o izkušnji z overthinkanjem.
     * Stabilnost aplikacije (število hroščev/zrušitev).
+    * Konverzija v premium tier (dolgoročno).
 
 ### 1.5. Edinstvene Prodajne Točke (Unique Selling Points - MVP)
-* **Specializiran AI Športni Psiholog:** Namenski AI asistent, treniran in usmerjen v specifike športne psihologije.
-* **Napreden Spomin in Kontekst:** AI ohranja kontinuiteto med seansami in uporablja globok kontekst (profili, pretekle seanse, Journey Notes, RAG) za visoko personalizirane interakcije znotraj športne domene.
-* **Zasebnost in Varnost:** Poudarek na varnem okolju za raziskovanje občutljivih tem.
+* **Specializiran AI Racionalni Prijatelj:** Namenski AI asistent, zasnovan za pomoč pri prepoznavanju in obvladovanju overthinkanja.
+* **Napreden Spomin in Kontekst:** AI ohranja kontinuiteto, prepoznava vzorce in uporablja globok kontekst (profili, pretekle seanse, prepoznani vzorci, RAG) za visoko personalizirane in prilagodljive interakcije.
+* **Izbira Avatarjev:** Možnost izbire med AI osebnostmi za bolj prilagojeno izkušnjo.
+* **Glasovna Interakcija:** Podpora za vnos govora (STT) in opcijski izhod govora (TTS) za lažjo uporabo.
+* **Zasebnost in Varnost:** Poudarek na varnem okolju za raziskovanje misli.
 * **Dostopnost:** Vedno na voljo (24/7) podpora v žepu.
-* **Informativni Viri:** Integrirani moduli s praktičnimi informacijami o športni psihologiji.
+* **Informativni Viri:** Integrirani moduli s praktičnimi metodami za obvladovanje overthinkanja, ki jih AI lahko uporabi v seansah.
+* **Dva Nivoja:** Brezplačen (Free) in Plačljiv (Premium) nivo z različnimi omejitvami/funkcijami.
 
 ---
 
@@ -53,73 +57,78 @@ MVP aplikacije Inner zagotavlja varen, zaseben in podpirajoč prostor, kjer lahk
 
 *(Podrobnejši opis je v dokumentu `App Flow Document (MVP v1.0.0)`)*
 
-* **Onboarding in Prijava/Registracija:** Uporabnik se lahko prijavi/registrira preko Apple ID ali Email/Gesla. Novi uporabniki gredo skozi kratek onboarding tok, kjer odgovorijo na nekaj vprašanj za izgradnjo statičnega profila (fokus na športnem kontekstu).
-* **Glavni Zaslon:** Po prijavi uporabnik vidi pozdrav, gumb za začetek nove seanse ter ikone za zgodovino in profil. Na dnu je drsljiva vrsta z informativnimi moduli o športni psihologiji.
-* **Tok Seanse:** Uporabnik začne novo (tekstovno) seanso z AI Športnim Psihologom. AI odgovarja na podlagi sporočil in bogatega konteksta (Memory/Context system). Seansa se lahko zaključi ročno (opcijsko), samodejno po neaktivnosti ali ob začetku nove.
-* **Tok Modulov:** Uporabnik lahko brska med moduli na glavnem zaslonu in si ogleda njihovo vsebino (samo za branje). Moduli služijo tudi kot vir znanja za AI (RAG).
+* **Onboarding in Prijava/Registracija:** Uporabnik se lahko prijavi/registrira preko Apple ID ali Email/Gesla. Novi uporabniki gredo skozi kratek onboarding tok, kjer odgovorijo na nekaj vprašanj za izgradnjo statičnega profila in **izberejo svojega AI avatarja**.
+* **Glavni Zaslon:** Po prijavi uporabnik vidi pozdrav, gumb za začetek nove seanse ter ikone za zgodovino in profil. Na dnu je drsljiva vrsta z informativnimi moduli o metodah proti overthinkanju. Prikazan je tudi izbrani AI avatar.
+* **Tok Seanse:** Uporabnik začne novo seanso z izbranim AI Racionalnim Prijateljem. Uporablja lahko **tekstovni vnos ali glasovni vnos (STT)**. AI odgovarja na podlagi sporočil in bogatega konteksta (Memory/Context system). Uporabnik lahko **opcijsko posluša AI odgovor (TTS)** s klikom na ikono. Seansa se lahko zaključi ročno, samodejno po neaktivnosti ali ob začetku nove.
+* **Tok Modulov:** Uporabnik lahko brska med moduli na glavnem zaslonu in si ogleda njihovo vsebino (samo za branje). Moduli vsebujejo metode/tehnike, ki jih AI lahko uporabi med seanso (RAG).
 * **Tok Zgodovine:** Uporabnik lahko dostopa do seznama preteklih seans, si ogleda njihov AI-generiran povzetek in zgodovino sporočil (samo za branje zaključenih seans).
-* **Tok Profila in Nastavitev:** Uporabnik lahko ureja svoj statični profil, si ogleduje dinamični profil in vizualiziran Journey Doc, dostopa do nastavitev (npr. brisanje računa, pravna besedila) in se odjavi.
+* **Tok Profila in Nastavitev:** Uporabnik lahko ureja svoj statični profil, si ogleduje AI-generiran dinamični profil ter **seznam glavnih vzorcev**, ki jih je AI prepoznal v njunih pogovorih. Dostopa do nastavitev (npr. brisanje računa, pravna besedila, morda menjava avatarja) in se odjavi.
 
 ---
 
 ## 3. Ključne Funkcionalnosti (Core Features - MVP)
 
-### 3.1. AI Klepetalne Seanse (s Športnim Psihologom)
-* **Opis:** Osrednja funkcionalnost aplikacije. Interaktivne, **izključno tekstovne** klepetalne seanse med uporabnikom in AI asistentom, ki deluje v vlogi **specializiranega Športnega Psihologa**.
+### 3.1. AI Klepetalne Seanse (z Racionalnim Prijateljem)
+* **Opis:** Osrednja funkcionalnost aplikacije. Interaktivne klepetalne seanse med uporabnikom in izbranim AI avatarjem (Racionalnim Prijateljem).
 * **Funkcionalnost:**
-    * Standardni klepetalni vmesnik (pošiljanje/prejemanje sporočil).
-    * AI odgovori so generirani s strani **Google Gemini 2.0 Flash**, usmerjeni s podrobnim sistemskim promptom za Športnega Psihologa.
-    * Odgovori AI se pretakajo (stream) v realnem času (SSE).
-    * **Integracija s Sistemom Spomina/Konteksta:** AI uporablja statični/dinamični profil, povzetek prejšnje seanse, Journey Notes (RAG) in bazo znanja športne psihologije (RAG) za zagotavljanje kontekstualnih in personaliziranih odgovorov.
-    * Zaključek seanse (ročno/avtomatsko) sproži procesiranje v ozadju (generiranje povzetka, Journey Notes, posodobitev din. profila).
-* **Omejitve MVP:** Brez glasovnega vnosa/izhoda. Brez možnosti izbire drugih terapevtov ali teorij v UI.
+    * Standardni klepetalni vmesnik.
+    * **Vnos:** Tekstovni ali glasovni (Speech-to-Text - STT).
+    * **Izhod:** Tekstovni odgovori AI, ki se pretakajo (stream) v realnem času (SSE). **Opcijski glasovni izhod (Text-to-Speech - TTS)** odgovora ob kliku na ikono.
+    * AI odgovori so generirani s strani **Google Gemini 2.0 Flash**, usmerjeni s podrobnim sistemskim promptom, specifičnim za izbranega avatarja in osredotočenim na racionalno analizo in boj proti overthinkanju.
+    * **Integracija s Sistemom Spomina/Konteksta:** AI uporablja statični/dinamični profil, povzetek prejšnje seanse, prepoznane vzorce (RAG), bazo znanja o metodah proti overthinkanju (RAG) za zagotavljanje kontekstualnih in personaliziranih odgovorov.
+    * Zaključek seanse sproži procesiranje v ozadju (generiranje povzetka, identifikacija in shranjevanje novih vzorcev, posodobitev din. profila).
+    * **Izbira Avatarja:** Uporabnik izbere enega od 3-5 AI avatarjev z unikatnimi sistemskimi promti (osebnostmi).
+* **Tier Omejitve:**
+    * **Free Tier:** Omejeno število sporočil na dan (npr. 5), uporablja osnovni model (Gemini 2.0 Flash).
+    * **Premium Tier:** Neomejeno število sporočil, potencialno boljši model v prihodnosti, neomejena uporaba TTS (znotraj fer uporabe).
 
-### 3.2. Informativni Moduli (Športna Psihologija)
-* **Opis:** Zbirka 5 člankov/zapisov, ki pokrivajo ključne teme, metode ali nasvete s področja športne psihologije.
+### 3.2. Informativni Moduli (Metode proti Overthinkanju)
+* **Opis:** Zbirka 4-5 člankov/zapisov, ki pokrivajo ključne tehnike, metode ali nasvete za obvladovanje overthinkanja (npr. CBT tehnike, mindfulness, reframing).
 * **Funkcionalnost:**
     * Uporabniki lahko brskajo in berejo vsebino modulov.
-    * Vsebina modulov služi kot **osnova za RAG bazo znanja** (tabela `module_embeddings`), ki jo AI uporablja med seansami.
-* **Omejitve MVP:** Moduli so samo za branje, brez interaktivnih elementov (npr. "Preizkusi v seansi").
+    * Vsebina modulov služi kot **osnova za RAG bazo znanja**, ki jo AI uporablja med seansami za predlaganje tehnik.
+* **Omejitve MVP:** Moduli so samo za branje, brez interaktivnih elementov (razen posredne uporabe preko AI).
 
 ### 3.3. Sistem Spomina in Konteksta (Memory & Context System)
-* **Opis:** Napreden sistem, ki AI Športnemu Psihologu omogoča ohranjanje kontinuitete in zagotavljanje globoko personaliziranih odgovorov. *(Podrobnosti v `Memory / Context Feature Document`)*.
+* **Opis:** Napreden sistem, ki AI Racionalnemu Prijatelju omogoča ohranjanje kontinuitete, prepoznavanje vzorcev in zagotavljanje globoko personaliziranih odgovorov. *(Podrobnosti v `Memory / Context Feature Document`)*.
 * **Funkcionalnost:**
-    * **Komponente Konteksta:** Statični profil, dinamični profil, povzetek zadnje seanse, Journey Notes (RAG), baza znanja športne psihologije (RAG), zgodovina trenutne seanse, sistemski prompt.
-    * **RAG (Retrieval-Augmented Generation):** Dinamično iskanje in vključevanje relevantnih informacij iz Journey Notes in baze znanja v AI prompt pred vsakim odgovorom. Uporablja Supabase AI embeddinge (`gte-small`) in `pgvector`.
-    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, ekstrakcija in shranjevanje Journey Notes (z embeddingi) ter posodabljanje dinamičnega profila uporabnika.
-* **Tehnične Zahteve:** Implementacija znotraj Supabase Edge Functions, uporaba definiranih tabel v `database_schema.md`.
+    * **Komponente Konteksta:** Statični profil, dinamični profil, povzetek zadnje seanse, **prepoznani vzorci** uporabnikovega razmišljanja (RAG), baza znanja o metodah proti overthinkanju (RAG), zgodovina trenutne seanse, sistemski prompt izbranega avatarja.
+    * **RAG (Retrieval-Augmented Generation):** Dinamično iskanje in vključevanje relevantnih informacij iz **zgodovine sporočil, prepoznanih vzorcev in baze znanja** v AI prompt. Uporablja Supabase AI embeddinge (`gte-small`) in `pgvector`.
+    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, **identifikacija, ekstrakcija in shranjevanje ključnih vzorcev razmišljanja** (z embeddingi za RAG) ter posodabljanje dinamičnega profila uporabnika.
+* **Tehnične Zahteve:** Implementacija znotraj Supabase Edge Functions, uporaba definiranih tabel v `database_schema.md` (prilagojeno za 'patterns' namesto 'journey_notes').
 
 ### 3.4. Uporabniški Profil in Zgodovina
 * **Opis:** Zasloni, ki omogočajo upravljanje in pregled uporabniških podatkov in preteklih interakcij.
 * **Funkcionalnost:**
-    * **Profil:** Urejanje statičnih podatkov (iz onboardinga), pregled AI-generiranega dinamičnega profila, pregled vizualiziranih Journey Doc Notes, dostop do nastavitev, odjava.
+    * **Profil:** Urejanje statičnih podatkov (iz onboardinga), pregled AI-generiranega dinamičnega profila, **pregled seznama prepoznanih vzorcev**, dostop do nastavitev, odjava, morda menjava avatarja.
     * **Zgodovina:** Seznam preteklih seans s povzetki, možnost ogleda celotne zgodovine sporočil zaključene seanse (read-only), možnost brisanja seans.
-    * **Nastavitve:** Osnovne nastavitve (Obvestila - če implementirano, Jezik - če implementirano) in dostop do pravnih besedil ter brisanja računa.
-* **Tehnične Zahteve:** Pridobivanje in prikazovanje podatkov iz tabel `profiles`, `dynamic_profiles`, `journey_notes`, `sessions`, `messages`. Implementacija funkcionalnosti brisanja in odjave.
+    * **Nastavitve:** Osnovne nastavitve (npr. upravljanje naročnine - če/ko relevantno) in dostop do pravnih besedil ter brisanja računa.
+* **Tehnične Zahteve:** Pridobivanje in prikazovanje podatkov iz tabel `profiles`, `dynamic_profiles`, `message_patterns` (ali podobno), `sessions`, `messages`. Implementacija funkcionalnosti brisanja in odjave.
 
 ---
 
 ## 4. Obseg MVP-ja (In-Scope vs Out-of-Scope)
 
 ### 4.1. V Obsegu (In-Scope Features - MVP)
-* Osnovna funkcionalnost AI klepeta s **specializiranim Športnim Psihologom**.
-* Napreden **Memory / Context System** (kot definiran).
-* **Tekstovna** interakcija v klepetu.
-* **5 Informativnih Modulov** o športni psihologiji (read-only + RAG vir).
-* **Onboarding** tok za zbiranje statičnega profila.
-* **Uporabniški Profil** (statični/dinamični/Journey Doc prikaz).
+* Osnovna funkcionalnost AI klepeta z **AI Racionalnim Prijateljem** (izbira med 3-5 avatarji).
+* Napreden **Memory / Context System** (kot definiran, s fokusom na prepoznavanju vzorcev).
+* **Tekstovna** in **Glasovna (STT)** interakcija v klepetu.
+* **Opcijski Glasovni Izhod (TTS)** AI odgovorov.
+* **4-5 Informativnih Modulov** o metodah proti overthinkanju (read-only + RAG vir).
+* **Onboarding** tok za zbiranje statičnega profila in izbiro avatarja.
+* **Uporabniški Profil** (statični/dinamični/prikaz prepoznanih vzorcev).
 * **Zgodovina Seans** (pregled, brisanje).
 * **Osnovne Nastavitve** (pravna besedila, brisanje računa).
 * **Avtentikacija** (Apple Sign In, Email/Password).
 * **Cross-platform** podpora (iOS, Android) preko Expo React Native.
 * **Osnovni UI/UX** (temna tema, glassy/glowing efekti).
+* **Tier Sistem:** Implementacija logike za Free (omejitve sporočil) in Premium (brez omejitev) nivo.
 
 ### 4.2. Izven Obsega (Out-of-Scope Features - MVP)
-* Drugi AI terapevti/psihološke usmeritve (Freudian, CBT, Družinska...).
+* Drugi AI terapevti/psihološke usmeritve razen "Racionalnega Prijatelja".
 * Multi-Agent arhitektura (Faza 2).
-* Glasovni vnos (STT) ali izhod (TTS).
-* Možnost izbire teorij/metod s strani uporabnika v UI med seanso.
-* Napredne analize počutja ali metrike (čeprav se podatki zbirajo).
+* Možnost izbire specifičnih metod/teorij s strani uporabnika v UI med seanso (razen posredno preko AI).
+* Napredne analize počutja ali metrike (čeprav se podatki zbirajo za vzorce).
 * Socialne funkcije, skupinske seanse.
 * Povezovanje s profesionalnimi terapevti.
 * Diagnostična orodja, medicinski nasveti.
@@ -128,6 +137,7 @@ MVP aplikacije Inner zagotavlja varen, zaseben in podpirajoč prostor, kjer lahk
 * Pripenjanje (pinning) seans v zgodovini.
 * Kompleksne animacije ali gamifikacija.
 * Offline način delovanja (razen morda prikaza že naloženih podatkov).
+* Upravljanje naročnin in plačila (implementacija plačilnega sistema, le logika za razlikovanje tirov).
 
 ---
 
@@ -135,12 +145,12 @@ MVP aplikacije Inner zagotavlja varen, zaseben in podpirajoč prostor, kjer lahk
 
 *(Podrobnosti v `Tech Stack Document (MVP v1.0.0)`)*
 
-* **Frontend:** Expo React Native, TypeScript, Expo Router, NativeWind, React Core APIs (State).
+* **Frontend:** Expo React Native, TypeScript, Expo Router, NativeWind, React Core APIs (State), knjižnice za STT/TTS (npr. Expo Speech, @react-native-voice/voice).
 * **Backend:** Supabase (Auth, PostgreSQL z `pgvector`, Edge Functions - Deno/TypeScript).
 * **AI Klepet:** Google Gemini 2.0 Flash (preko Edge Functions).
 * **Embeddings:** Supabase AI vgrajen model (`gte-small`) (preko Edge Functions).
 * **Avtentikacija:** Supabase Auth (Email/Pass, Apple).
-* **Primarni API-ji:** Supabase API, Google Gemini API.
+* **Primarni API-ji:** Supabase API, Google Gemini API, API-ji za STT/TTS (odvisno od izbrane knjižnice).
 
 ---
 
@@ -178,35 +188,38 @@ MVP aplikacije Inner zagotavlja varen, zaseben in podpirajoč prostor, kjer lahk
 
 ### 8.1. Omejitve
 * **Ekipa:** Razvoj izvaja ena oseba.
-* **Časovnica:** Ni strogega roka (stranski projekt), vendar ciljamo na čim hitrejši MVP.
-* **Proračun:** Ni specificiran; predvideva se uporaba brezplačnih ali "pay-as-you-go" nivojev storitev (Supabase, Gemini), dokler je mogoče.
-* **Obseg MVP:** Strogo omejen na zgoraj definirane funkcionalnosti.
+* **Časovnica:** Razvoj MVP-ja mora biti zaključen in aplikacija poslana v pregled na App Store **v roku 1 meseca** od začetka.
+* **Proračun:** Ni specificiran; predvideva se uporaba brezplačnih ali "pay-as-you-go" nivojev storitev (Supabase, Gemini, STT/TTS API-ji), dokler je mogoče in stroškovno učinkovito za MVP.
+* **Obseg MVP:** Strogo omejen na zgoraj definirane funkcionalnosti v sekciji 4.1.
 
 ### 8.2. Predpostavke
-* **Uporabniki:** Razumejo, da aplikacija ni nadomestilo za profesionalno terapijo. So tehnično dovolj pismeni za uporabo mobilne aplikacije. So pripravljeni na reflektivno tekstovno komunikacijo z AI. Najdejo vrednost v specializiranem AI Športnem Psihologu.
-* **Tehnologija:** Supabase in Google Gemini API bosta zagotavljala zanesljive in dovolj zmogljive storitve po sprejemljivih cenah za MVP obseg. Izbrani tehnični sklop (Expo RN, Supabase AI Embeddings) je primeren za implementacijo zahtevanih funkcionalnosti.
-* **Razvoj:** Ena oseba lahko obvlada kompleksnost razvoja MVP-ja v razumnem času.
+* **Uporabniki:** Razumejo, da aplikacija ni nadomestilo za profesionalno terapijo. So tehnično dovolj pismeni za uporabo mobilne aplikacije, vključno z glasovnimi funkcijami. So pripravljeni na reflektivno komunikacijo z AI (tekstovno ali glasovno). Najdejo vrednost v AI Racionalnem Prijatelju za pomoč pri overthinkanju.
+* **Tehnologija:** Supabase in Google Gemini API bosta zagotavljala zanesljive in dovolj zmogljive storitve po sprejemljivih cenah za MVP obseg. Izbrani tehnični sklop (Expo RN, Supabase AI Embeddings, STT/TTS knjižnice) je primeren za implementacijo zahtevanih funkcionalnosti.
+* **Razvoj:** Ena oseba lahko obvlada kompleksnost razvoja MVP-ja v zastavljenem 1-mesečnem roku.
 
 ---
 
 ## 9. Ocena Tveganja (Risk Assessment - MVP)
 
 * **Tehnična Tveganja:**
-    * Kompleksnost implementacije Memory/Context sistema in RAG (zagotavljanje relevance in zmogljivosti).
+    * Kompleksnost implementacije Memory/Context sistema s prepoznavanjem vzorcev in RAG (zagotavljanje relevance in zmogljivosti).
     * Zanesljivost/latenca/stroški Supabase storitev (DB, Auth, Edge Functions, AI Embeddings).
     * Zanesljivost/latenca/stroški/omejitve Gemini 2.0 Flash API.
-    * Izzivi pri integraciji vseh komponent (RN -> Edge Function -> Gemini -> DB -> RAG -> Edge Function -> RN).
+    * Zanesljivost/latenca/stroški/kakovost izbranih STT in TTS rešitev/API-jev.
+    * Izzivi pri integraciji vseh komponent (RN -> STT -> Edge Function -> Gemini -> DB -> RAG -> Edge Function -> TTS -> RN).
+    * Časovna omejitev (1 mesec) za implementacijo vseh funkcij, vključno z novimi (STT/TTS, avatarji, vzorci).
 * **Tveganja Uporabniške Izkušnje:**
-    * AI odgovori niso dovolj koristni, relevantni ali empatični kljub kontekstu.
-    * Uporabniki ne vidijo vrednosti v *samo* Športnem Psihologu.
-    * UI/UX ni dovolj intuitiven ali prijeten za uporabo.
+    * AI odgovori niso dovolj koristni, relevantni ali empatični kljub kontekstu in avatarjem.
+    * Uporabniki ne vidijo vrednosti v konceptu Racionalnega Prijatelja ali pa jim avatarji niso všeč.
+    * UI/UX ni dovolj intuitiven ali prijeten za uporabo, še posebej z glasovnimi funkcijami.
+    * Kakovost STT ali TTS ni zadovoljiva.
 * **Tveganja Odvisnosti:**
-    * Spremembe v Supabase ali Gemini API-jih, ki zahtevajo prilagoditve kode.
-    * Morebitne omejitve brezplačnih nivojev storitev.
+    * Spremembe v Supabase, Gemini, STT/TTS API-jih, ki zahtevajo prilagoditve kode.
+    * Morebitne omejitve ali skriti stroški brezplačnih/plačljivih nivojev storitev.
 * **Varnostna Tveganja:**
     * Nenamerno razkritje občutljivih podatkov zaradi napak v RLS politikah ali kodi.
-    * Varnostne ranljivosti v uporabljenih knjižnicah.
+    * Varnostne ranljivosti v uporabljenih knjižnicah (vključno s STT/TTS).
 * **Tveganja Višje Sile:**
-    * Pomanjkanje časa razvijalca za dokončanje projekta.
+    * Pomanjkanje časa razvijalca za dokončanje projekta v 1 mesecu.
 
 *(Za vsako tveganje je treba med razvojem razmišljati o strategijah mitigacije in ukrepih ob morebitnem nastopu.)*

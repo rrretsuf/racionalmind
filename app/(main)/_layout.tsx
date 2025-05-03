@@ -9,6 +9,7 @@ export default function MainLayout() {
       <Stack.Screen name="session" />
       <Stack.Screen name="history" />
       <Stack.Screen name="profile" />
+      <Stack.Screen name="module" />
       {/* Add other main screens like settings, module details later */}
     </Stack>
   )

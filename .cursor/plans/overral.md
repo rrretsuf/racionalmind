@@ -4,34 +4,34 @@
 
 Ta dokument opisuje strateški načrt za dolgoročni razvoj mobilne aplikacije Inner. Načrt je razdeljen na ključne faze, ki gradijo ena na drugi, z jasno definirano končno vizijo ("North Star"). Vsaka faza predstavlja pomemben mejnik v evoluciji aplikacije od specializiranega orodja do celostnega, visoko personaliziranega AI terapevtskega asistenta.
 
-## 2. Faza 1: MVP - Temelji in Športna Psihologija (Trenutni Fokus)
+## 2. Faza 1: MVP - Temelji in AI Racionalni Prijatelj (Trenutni Fokus)
 
-* **Cilj:** Lansirati stabilno in funkcionalno osnovno verzijo aplikacije (Minimum Viable Product), osredotočeno izključno na **AI Športnega Psihologa/Terapevta**. Postaviti tehnične temelje in preizkusiti osnovno vrednost za uporabnike na področju športne psihologije.
+* **Cilj:** Lansirati stabilno in funkcionalno osnovno verzijo aplikacije (Minimum Viable Product), osredotočeno izključno na **AI Racionalnega Prijatelja**, ki pomaga mladim pri **obvladovanju overthinkanja**. Postaviti tehnične temelje in preizkusiti osnovno vrednost za ciljno publiko (16-24 let).
 * **Ključne Značilnosti:**
     * Cross-platform mobilna aplikacija (iOS, Android) z uporabo Expo React Native.
     * Varen backend z uporabo Supabase (Avtentikacija, PostgreSQL baza, Edge Funkcije).
     * Osnovni uporabniški vmesnik (Welcome, Onboarding, Main Screen, Session Screen, Read-only Modules, History, Profile, Settings).
-    * Tekstovna komunikacija z AI Športnim Psihologom (poganja Gemini 2.0 Flash).
-    * Napredna **Memory / Context funkcionalnost** (Statični/Dinamični profil, Povzetek prejšnje seanse, Journey Doc Notes RAG, Sports Psychology Knowledge RAG).
-    * Informativni moduli (članki) s področja športne psihologije (za RAG in branje).
+    * Tekstovna in glasovna komunikacija z **AI Racionalnim Prijateljem** (poganja Gemini 2.0 Flash, izbira med 3-5 avatarji).
+    * Napredna **Memory / Context funkcionalnost** (Statični/Dinamični profil, Povzetek prejšnje seanse, **Prepoznani Vzorci (RAG)**, Baza znanja o metodah proti overthinkanju (RAG)).
+    * Informativni moduli (članki) s področja **obvladovanja overthinkanja** (za RAG in branje).
     * Specifičen UI/UX (temna tema, glassy/glowing efekti, minimalističen dizajn).
-* **Namen Te Faze:** Zgraditi jedro aplikacije, validirati koncept AI športnega terapevta, zbrati povratne informacije uporabnikov in ustvariti stabilno platformo za prihodnje razširitve.
+* **Namen Te Faze:** Zgraditi jedro aplikacije, validirati koncept AI Racionalnega Prijatelja za pomoč pri overthinkanju, zbrati povratne informacije uporabnikov in ustvariti stabilno platformo za prihodnje razširitve.
 
-## 3. Faza 2: Multi-Agent Orodje - Poglobljena Športna Psihologija
+## 3. Faza 2: Multi-Agent Orodje - Poglobljen AI Racionalni Prijatelj
 
-* **Cilj:** Izboljšati in poglobiti zmožnosti obstoječega AI Športnega Psihologa z uvedbo **multi-agent arhitekture**, ki temelji na **Google Agent Development Kit**. Aplikacija ostaja osredotočena na športno psihologijo.
+* **Cilj:** Izboljšati in poglobiti zmožnosti obstoječega **AI Racionalnega Prijatelja** z uvedbo **multi-agent arhitekture**, ki temelji na **Google Agent Development Kit**. Aplikacija ostaja osredotočena na **pomoč pri obvladovanju overthinkanja**.
 * **Ključne Značilnosti:**
     * **Integracija Google Agent Development Kit:** Implementacija ogrodja za upravljanje več AI agentov.
     * **Hierarhična Struktura Agentov:**
-        * **Manager Agent (Glavni Športni Psiholog):** Še naprej komunicira neposredno z uporabnikom, analizira potrebe in delegira naloge pod-agentom. Ohranja celosten pogled na uporabnika in seanso.
-        * **Specializirani Pod-Agenti (Športna Psihologija):** Več manjših agentov, vsak specializiran za **zelo specifično področje znotraj športne psihologije** (npr. agent za obvladovanje treme pred tekmovanjem, agent za motivacijo po porazu, agent za vizualizacijo uspeha, agent za postavljanje ciljev, agent za okrevanje po poškodbi, agent za fokus in koncentracijo itd.). Ti agenti izvajajo poglobljene analize ali generirajo specifične intervencije/vaje na zahtevo Manager Agenta.
-    * **Dinamična Interakcija Agentov:** Manager Agent orkestrira delo pod-agentov znotraj ene seanse za zagotavljanje bolj niansiranih in ciljno usmerjenih odgovorov.
-    * **Razširljivost:** Arhitektura je zasnovana tako, da omogoča dodajanje novih specializiranih pod-agentov v prihodnosti (potencialno stotine, kot si omenil, kjer lahko agenti nižjega nivoja kličejo še bolj specializirane agente).
-* **Namen Te Faze:** Bistveno povečati "inteligenco" in učinkovitost AI Športnega Psihologa z uporabo specializiranih agentov. Uporabniku ponuditi še bolj poglobljeno in prilagojeno podporo znotraj športne domene. Zgraditi in preizkusiti multi-agent ogrodje za kasnejšo uporabo na drugih področjih. Gradi neposredno na MVP temeljih (AI, Memory/Context, Platforma).
+        * **Manager Agent (Glavni Racionalni Prijatelj):** Še naprej komunicira neposredno z uporabnikom, analizira potrebe in delegira naloge pod-agentom. Ohranja celosten pogled na uporabnika in seanso v kontekstu overthinkanja.
+        * **Specializirani Pod-Agenti (Obvladovanje Overthinkanja):** Več manjših agentov, vsak specializiran za **zelo specifičen vidik overthinkanja ali sorodno tehniko** (npr. agent za prepoznavanje kognitivnih distorzij, agent za tehnike reframinga, agent za metode čuječnosti, agent za analizo skrbi, agent za spodbujanje k akciji itd.). Ti agenti izvajajo poglobljene analize ali generirajo specifične intervencije/vaje na zahtevo Manager Agenta.
+    * **Dinamična Interakcija Agentov:** Manager Agent orkestrira delo pod-agentov znotraj ene seanse za zagotavljanje bolj niansiranih in ciljno usmerjenih odgovorov pri obravnavi overthinkanja.
+    * **Razširljivost:** Arhitektura je zasnovana tako, da omogoča dodajanje novih specializiranih pod-agentov v prihodnosti za še boljše pokrivanje različnih vidikov overthinkanja in povezanih tem.
+* **Namen Te Faze:** Bistveno povečati "inteligenco" in učinkovitost **AI Racionalnega Prijatelja** z uporabo specializiranih agentov. Uporabniku ponuditi še bolj poglobljeno in prilagojeno podporo znotraj **domene obvladovanja overthinkanja**. Zgraditi in preizkusiti multi-agent ogrodje za kasnejšo uporabo na drugih področjih (v Fazi 3). Gradi neposredno na MVP temeljih (AI, Memory/Context, Platforma).
 
 ## 4. Faza 3: Razširitev na Več Terapevtskih Področij
 
-* **Cilj:** Razširiti funkcionalnost aplikacije **izven domene športne psihologije** z dodajanjem **novih AI terapevtov/svetov**, specializiranih za druga področja človeške psihologije in osebne rasti.
+* **Cilj:** Razširiti funkcionalnost aplikacije **izven domene overthinkinja** z dodajanjem **novih AI terapevtov/svetov**, specializiranih za druga področja človeške psihologije in osebne rasti.
 * **Ključne Značilnosti:**
     * **Implementacija Novih Terapevtskih Usmeritev:** Dodajanje novih AI "osebnosti" ali "svetov", kot so:
         * Terapevt za Introspekcijo (npr. temelječ na Freudianskih ali Jungovskih konceptih).

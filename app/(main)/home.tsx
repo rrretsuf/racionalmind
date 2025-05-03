@@ -55,7 +55,6 @@ export default function Home() {
         {/* Start Session Button - Replace with component */}
         <StartSessionButton
           onPress={() => router.push('/(main)/session')}
-          style={{ marginBottom: 60 }}
         />
 
 

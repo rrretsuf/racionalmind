@@ -2,11 +2,11 @@
 
 ## 1. Uvod in Cilj Dokumenta
 
-Ta dokument je zemljevid MVP verzije aplikacije Inner. Podrobno opisuje vsak zaslon in pojasnjuje, kako se uporabniki premikajo med njimi. Jezik je preprost in specifičen, da olajša razumevanje. Vse je jasno zapisano, da se prepreči zmeda. Cilj MVP-ja je zagotoviti osnovno funkcionalnost, osredotočeno na AI športnega psihologa/terapevta, in služi kot vodilo za razvoj ter oblikovanje.
+Ta dokument je zemljevid MVP verzije aplikacije Inner. Podrobno opisuje vsak zaslon in pojasnjuje, kako se uporabniki premikajo med njimi. Jezik je preprost in specifičen, da olajša razumevanje. Vse je jasno zapisano, da se prepreči zmeda. Cilj MVP-ja je zagotoviti osnovno funkcionalnost, osredotočeno na **AI Racionalnega Prijatelja**, ki pomaga pri obvladovanju **overthinkanja**, in služi kot vodilo za razvoj ter oblikovanje.
 
 ## 2. Onboarding in Prijava/Registracija (Sign-In/Sign-Up)
 
-**Namen:** Omogočiti novim uporabnikom ustvarjanje računa, obstoječim prijavo in zbrati osnovne informacije za statični profil uporabnika, ki jih bo AI lahko upošteval.
+**Namen:** Omogočiti novim uporabnikom ustvarjanje računa, obstoječim prijavo in zbrati osnovne informacije za statični profil uporabnika, ki jih bo AI lahko upošteval pri nudenju **podpore za racionalno razmišljanje**.
 
 ### 2.1. Welcome Screen (Pozdravni Zaslon)
 
@@ -54,18 +54,21 @@ Ta dokument je zemljevid MVP verzije aplikacije Inner. Podrobno opisuje vsak zas
 
 ### 3.2. Session Screen (Zaslon Seanse)
 
-* **Namen:** Omogočiti uporabniku tekstovno komunikacijo z AI športnim psihologom/terapevtom v varnem in namenskem okolju.
+* **Namen:** Omogočiti uporabniku tekstovno **in glasovno** komunikacijo z **izbranim AI Racionalnim Prijateljem** v varnem in namenskem okolju, s ciljem **raziskovanja in obvladovanja misli, ki vodijo v overthinkanje**.
 * **Vstop:** Ko uporabnik pritisne gumb "Start New Session" na `Main Screen`.
 * **Struktura:** Zaslon je preprost AI klepetalniški vmesnik, podoben aplikacijam kot sta ChatGPT ali Grok.
-    * Prikaz zgodovine sporočil v obliki oblačkov (chat bubbles): uporabnikova sporočila na desni, AI odgovori na levi.
+    * Prikaz zgodovine sporočil v obliki oblačkov (chat bubbles): uporabnikova sporočila na desni, AI odgovori na levi. **Pod vsakim AI oblačkom je majhna ikona zvočnika ("Listen")**.
     * Na dnu zaslona je tekstovno polje, kamor uporabnik lahko vtipka sporočilo.
-    * Zraven tekstovnega polja je gumb "Send" (Pošlji).
+    * **Levo od tekstovnega polja je ikona mikrofona ("Voice Input")**.
+    * **Desno od tekstovnega polja** je gumb "Send" (Pošlji).
 * **Funkcionalnost:**
     * Uporabnik vtipka svoje sporočilo in pritisne gumb "Send", da ga pošlje AI-ju.
+    * **Alternativno lahko uporabnik pritisne ikono mikrofona, govori, in njegov govor se pretvori v besedilo (STT) ter vnese v tekstovno polje (ali neposredno pošlje).**
     * AI odgovori s tekstovnim oblačkom nad vnosnim poljem.
+    * **Uporabnik lahko pritisne ikono zvočnika pod AI sporočilom, da posluša AI odgovor, prebran na glas (TTS).**
     * Implementirana je napredna funkcionalnost "Memory / Context Feature" (podrobneje opisana v ločenem dokumentu), ki AI-ju omogoča dostop do relevantnega konteksta (statični/dinamični profil, prejšnje seanse, Journey Doc, RAG iz modulov).
-    * **MVP Omejitev:** V uporabniškem vmesniku **ni** možnosti izbire drugega terapevta ali eksplicitnega dodajanja/spreminjanja teorij/protokolov. AI je vedno konfiguriran kot športni psiholog. Kontekst iz modulov se lahko dinamično vključi preko RAG sistema v ozadju.
-    * **MVP Omejitev:** Glasovni vnos in izhod (TTS - branje AI odgovorov) **nista** del MVP-ja.
+    * **MVP Omejitev:** V uporabniškem vmesniku **ni** možnosti izbire drugega AI avatarja **med seanso** (izbira se ob onboardingu ali morda v profilu). AI je vedno konfiguriran kot Racionalni Prijatelj z izbrano osebnostjo. Kontekst iz modulov se lahko dinamično vključi preko RAG sistema v ozadju.
+    * **MVP Omejitev:** Polna funkcionalnost STT in TTS je del MVP-ja.
     * **Konec Seanse:** Seansa se zaključi na enega od naslednjih načinov:
         * **Ročno:** Uporabnik pritisne namenski gumb "End Session" (Zaključi seanso) - *implementacija tega gumba je opcijska za MVP*.
         * **Avtomatsko (timeout):** Seansa se samodejno zaključi po določenem obdobju neaktivnosti (npr. 12 ur).
@@ -75,7 +78,7 @@ Ta dokument je zemljevid MVP verzije aplikacije Inner. Podrobno opisuje vsak zas
 
 ### 3.3. Module Detail Screen (Zaslon Podrobnosti Modula)
 
-* **Namen:** Prikazati informativno vsebino o specifičnem protokolu, nasvetu ali temi s področja športne psihologije. **(Samo za branje v MVP)**.
+* **Namen:** Prikazati informativno vsebino o specifičnem protokolu, nasvetu ali temi s področja **obvladovanja overthinkanja in racionalnega razmišljanja**. **(Samo za branje v MVP)**.
 * **Vstop:** Ko uporabnik pritisne kartico modula na `Main Screen`.
 * **Struktura:** Zaslon izgleda kot dobro oblikovan članek ali blog zapis.
     * Na vrhu je naslov modula.

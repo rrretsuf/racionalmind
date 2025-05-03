@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+**IMPORTANT:** Due to security restrictions, the standard `.env` file is **not directly accessible**.
+
+For any task requiring environment variable values (e.g., API keys, URLs), **you must ask the user the contents of .env file or tell him how he must manually update it**
