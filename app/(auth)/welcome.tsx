@@ -7,11 +7,6 @@ import AuthButton from '../../components/AuthButton';
 export default function WelcomeScreen() {
   const router = useRouter();
 
-
-  const handlePress = () => {
-    router.push('/(main)/home');
-  };
-
   return (
     <ImageBackground
       source={require('../../assets/images/background-welcome.png')}
@@ -25,7 +20,7 @@ export default function WelcomeScreen() {
               Welcome to
             </Text>
             <Text className="text-title text-primary font-medium">
-              Inner
+              Rational Mind
             </Text>
             <Text className="text-base text-secondary font-regular mt-6 leading-relaxed max-w-[300px]">
               Start your mental strength journey in a secure, personalized, safe space.
@@ -35,7 +30,7 @@ export default function WelcomeScreen() {
 
         <View className="w-full mb-20">
           <AuthButton
-            onPress={handlePress}
+            router={router}
           />
         </View>
       </View>

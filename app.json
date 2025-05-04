@@ -8,7 +8,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rrretsuf.inner"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,8 +24,7 @@
       "expo-router",
       [
         "expo-splash-screen",
-        {
-        }
+        {}
       ],
       [
         "@sentry/react-native/expo",
