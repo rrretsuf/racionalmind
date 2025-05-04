@@ -2,35 +2,36 @@ import React from 'react';
 import { View, TextInput, TouchableOpacity, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface ChatInputProps extends TextInputProps {
-  message: string;
-  setMessage: (text: string) => void;
+interface ChatInputProps extends Omit<TextInputProps, 'onChangeText' | 'value'> {
+  value: string;
+  onChangeText: (text: string) => void;
   onSend: () => void;
+  isLoading: boolean;
 }
 
-export default function ChatInput({ message, setMessage, onSend, ...rest }: ChatInputProps) {
-  const isSendDisabled = message.trim().length === 0;
-
+const ChatInput: React.FC<ChatInputProps> = ({ value, onChangeText, onSend, isLoading, ...rest }) => {
   return (
-    <View className="flex-row items-center bg-input-field border border-input-border rounded-full pl-4 pr-2 py-2"> 
+    <View className="flex-row items-center bg-input-bg border border-input-border rounded-xl p-2 py-3">
       <TextInput
-        className="flex-1 text-base text-text-primary font-regular py-2 mr-2"
-        placeholder="What is on your mind..."
+        className="flex-1 text-primary text-base px-2 mr-2"
         placeholderTextColor="#7784A5"
-        value={message}
-        onChangeText={setMessage}
+        value={value}
+        onChangeText={onChangeText}
         multiline
-        style={{ textAlignVertical: 'center' }} 
+        blurOnSubmit={false}
         {...rest}
       />
-      <TouchableOpacity
-        onPress={onSend}
-        disabled={isSendDisabled}
-        className={`w-10 h-10 rounded-full bg-primary justify-center items-center ml-1 ${isSendDisabled ? 'opacity-50' : ''}`}
-        accessibilityLabel="Send message"
-      >
-        <Ionicons name="arrow-up" size={22} color="#18274D" />
+      <TouchableOpacity onPress={onSend} disabled={isLoading || value.trim().length === 0}>
+        <View className={`p-2 rounded-full bg-white/20`}>
+          <Ionicons 
+            name={isLoading ? "square" : "arrow-up"}
+            size={20} 
+            color={'#FFFFFF'}
+          />
+        </View>
       </TouchableOpacity>
     </View>
   );
-} 
+};
+
+export default ChatInput; 

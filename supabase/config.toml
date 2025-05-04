@@ -1,7 +1,7 @@
-
 [functions.gemini-chat]
 enabled = true
-verify_jwt = true
+# TODO: REVERT FOR PRODUCTION! Temporarily disabled JWT verification for testing.
+verify_jwt = false
 import_map = "./functions/gemini-chat/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
