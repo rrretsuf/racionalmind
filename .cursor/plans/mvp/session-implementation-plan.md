@@ -18,6 +18,9 @@ This plan outlines the steps required to implement the advanced session manageme
     *   [ ] Implement basic control flow: differentiate between first message and subsequent messages in a session.
     *   [x] Add basic error handling (invalid input, missing data, DB errors).
     *   [x] Stub out placeholder calls for fetching context and using Gemini SDK.
+*   [x] Create openai-chat edge function
+*   [x] Switch client to OpenAI streaming
+*   [x] Remove Gemini chat function and dependencies
 
 **Phase 2: Context & Caching**
 
