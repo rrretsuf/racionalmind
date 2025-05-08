@@ -1,7 +1,7 @@
-# Rational Mind App - Project Requirements Document (MVP v1.0.0)
+# Rational Mind App - Project Requirements Document (MVP v2.0.0)
 
-**Verzija:** 1.0.0
-**Datum:** 12. april 2025
+**Verzija:** 2.0.0 (Updated with OpenAI Models)
+**Datum:** 8. maj 2025
 
 **Kazalo Vsebine**
 1.  Pregled Aplikacije (App Overview)
@@ -22,7 +22,7 @@
 **Rational Mind**
 
 ### 1.2. Namen Aplikacije (MVP)
-MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem mladi med 16. in 24. letom, ki se soočajo z overthinkanjem) komunicirajo s personaliziranim **AI Racionalnim Prijateljem**. AI, ki ga poganja Gemini 2.0 Flash in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati in obvladovati misli, ki vodijo v overthinkanje, ter spodbuja samorazumevanje in razvoj strategij za mentalno jasnost. AI se uči o uporabniku, prepoznava vzorce in prilagaja svoje odgovore, deluje kot vedno dostopen (24/7) prijatelj. Uporabniki lahko izbirajo med 3-5 AI avatarji z različnimi osebnostmi (definiranimi s sistemskimi promti). MVP služi kot temelj za prihodnje razširitve in uvedbo premium funkcij.
+MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem mladi med 16. in 24. letom, ki se soočajo z overthinkanjem) komunicirajo s personaliziranim **AI Racionalnim Prijateljem**[cite: 8]. AI, ki ga poganjajo **OpenAI modeli (`o4-mini` in `40 mini`)** [cite: 13, 15] in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati in obvladovati misli, ki vodijo v overthinkanje, ter spodbuja samorazumevanje in razvoj strategij za mentalno jasnost[cite: 8]. AI se uči o uporabniku, prepoznava vzorce in prilagaja svoje odgovore, deluje kot vedno dostopen (24/7) prijatelj. Uporabniki lahko izbirajo med 3-5 AI avatarji z različnimi osebnostmi (definiranimi s sistemskimi promti). MVP služi kot temelj za prihodnje razširitve in uvedbo premium funkcij.
 
 ### 1.3. Ciljna Publika (MVP)
 * Mladi odrasli (16-24 let), ki se pogosto znajdejo v zankah overthinkanja.
@@ -49,7 +49,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 * **Zasebnost in Varnost:** Poudarek na varnem okolju za raziskovanje misli.
 * **Dostopnost:** Vedno na voljo (24/7) podpora v žepu.
 * **Informativni Viri:** Integrirani moduli s praktičnimi metodami za obvladovanje overthinkanja, ki jih AI lahko uporabi v seansah.
-* **Dva Nivoja:** Brezplačen (Free) in Plačljiv (Premium) nivo z različnimi omejitvami/funkcijami.
+* **Trije Nivoji:** **Uporabnik brez računa (No Account)**[cite: 21], **Brezplačen račun (Free)**[cite: 21], in **Plačljiv račun (Paying)** [cite: 21] z različnimi omejitvami/funkcijami in uporabljenimi AI modeli[cite: 19, 20].
 
 ---
 
@@ -74,13 +74,14 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
     * Standardni klepetalni vmesnik.
     * **Vnos:** Tekstovni ali glasovni (Speech-to-Text - STT).
     * **Izhod:** Tekstovni odgovori AI, ki se pretakajo (stream) v realnem času (SSE). **Opcijski glasovni izhod (Text-to-Speech - TTS)** odgovora ob kliku na ikono.
-    * AI odgovori so generirani s strani **Google Gemini 2.0 Flash**, usmerjeni s podrobnim sistemskim promptom, specifičnim za izbranega avatarja in osredotočenim na racionalno analizo in boj proti overthinkanju.
+    * AI odgovori so generirani s strani **OpenAI modelov (`o4-mini` ali `40 mini`, odvisno od nivoja uporabnika)**[cite: 13, 15], usmerjeni s podrobnim sistemskim promptom, specifičnim za izbranega avatarja in osredotočenim na racionalno analizo in boj proti overthinkanju.
     * **Integracija s Sistemom Spomina/Konteksta:** AI uporablja statični/dinamični profil, povzetek prejšnje seanse, prepoznane vzorce (RAG), bazo znanja o metodah proti overthinkanju (RAG) za zagotavljanje kontekstualnih in personaliziranih odgovorov.
-    * Zaključek seanse sproži procesiranje v ozadju (generiranje povzetka, identifikacija in shranjevanje novih vzorcev, posodobitev din. profila).
+    * Zaključek seanse sproži procesiranje v ozadju (generiranje povzetka, identifikacija in shranjevanje novih vzorcev, posodobitev din. profila) z uporabo **ustreznega modela glede na nivo uporabnika (`o4-mini` za plačljive, `40 mini` za brezplačne)**[cite: 13, 15].
     * **Izbira Avatarja:** Uporabnik izbere enega od 3-5 AI avatarjev z unikatnimi sistemskimi promti (osebnostmi).
-* **Tier Omejitve:**
-    * **Free Tier:** Omejeno število sporočil na dan (npr. 5), uporablja osnovni model (Gemini 2.0 Flash).
-    * **Premium Tier:** Neomejeno število sporočil, potencialno boljši model v prihodnosti, neomejena uporaba TTS (znotraj fer uporabe).
+* **Tier Omejitve**[cite: 20, 21]:
+    * **No Account (Tier 0):** Omejeno na 5 sporočil na dan. Uporablja **`40 mini`** za klepet. Kontekst/spomin funkcija (background processing, RAG) je onemogočena.
+    * **Free Account (Tier 1):** Omejeno na 10 sporočil na dan. Uporablja **`40 mini`** za klepet in **`40 mini`** za procesiranje v ozadju (kontekst/spomin, RAG).
+    * **Paying Account (Tier 2):** Neomejeno število sporočil. Uporablja **`o4-mini`** za klepet in **`o4-mini`** za procesiranje v ozadju (kontekst/spomin, RAG).
 
 ### 3.2. Informativni Moduli (Metode proti Overthinkanju)
 * **Opis:** Zbirka 4-5 člankov/zapisov, ki pokrivajo ključne tehnike, metode ali nasvete za obvladovanje overthinkanja (npr. CBT tehnike, mindfulness, reframing).
@@ -94,7 +95,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 * **Funkcionalnost:**
     * **Komponente Konteksta:** Statični profil, dinamični profil, povzetek zadnje seanse, **prepoznani vzorci** uporabnikovega razmišljanja (RAG), baza znanja o metodah proti overthinkanju (RAG), zgodovina trenutne seanse, sistemski prompt izbranega avatarja.
     * **RAG (Retrieval-Augmented Generation):** Dinamično iskanje in vključevanje relevantnih informacij iz **zgodovine sporočil, prepoznanih vzorcev in baze znanja** v AI prompt. Uporablja Supabase AI embeddinge (`gte-small`) in `pgvector`.
-    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, **identifikacija, ekstrakcija in shranjevanje ključnih vzorcev razmišljanja** (z embeddingi za RAG) ter posodabljanje dinamičnega profila uporabnika.
+    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, **identifikacija, ekstrakcija in shranjevanje ključnih vzorcev razmišljanja** (z embeddingi za RAG) ter posodabljanje dinamičnega profila uporabnika. Uporabljen model (`o4-mini` ali `40 mini`) je odvisen od nivoja uporabnika[cite: 13, 15].
 * **Tehnične Zahteve:** Implementacija znotraj Supabase Edge Functions, uporaba definiranih tabel v `database_schema.md` (prilagojeno za 'patterns' namesto 'journey_notes').
 
 ### 3.4. Uporabniški Profil in Zgodovina
@@ -111,7 +112,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 
 ### 4.1. V Obsegu (In-Scope Features - MVP)
 * Osnovna funkcionalnost AI klepeta z **AI Racionalnim Prijateljem** (izbira med 3-5 avatarji).
-* Napreden **Memory / Context System** (kot definiran, s fokusom na prepoznavanju vzorcev).
+* Napreden **Memory / Context System** (kot definiran, s fokusom na prepoznavanju vzorcev in uporabo modelov `o4-mini`/`40 mini` glede na nivo)[cite: 13, 15, 20].
 * **Tekstovna** in **Glasovna (STT)** interakcija v klepetu.
 * **Opcijski Glasovni Izhod (TTS)** AI odgovorov.
 * **4-5 Informativnih Modulov** o metodah proti overthinkanju (read-only + RAG vir).
@@ -122,7 +123,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 * **Avtentikacija** (Apple Sign In, Email/Password).
 * **Cross-platform** podpora (iOS, Android) preko Expo React Native.
 * **Osnovni UI/UX** (temna tema, glassy/glowing efekti).
-* **Tier Sistem:** Implementacija logike za Free (omejitve sporočil) in Premium (brez omejitev) nivo.
+* **Tier Sistem:** Implementacija logike za **No Account**, **Free** in **Paying** nivoje z ustreznimi omejitvami in modeli[cite: 20, 21].
 
 ### 4.2. Izven Obsega (Out-of-Scope Features - MVP)
 * Drugi AI terapevti/psihološke usmeritve razen "Racionalnega Prijatelja".
@@ -138,6 +139,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 * Kompleksne animacije ali gamifikacija.
 * Offline način delovanja (razen morda prikaza že naloženih podatkov).
 * Upravljanje naročnin in plačila (implementacija plačilnega sistema, le logika za razlikovanje tirov).
+* **Deep Thinking Mode**[cite: 7].
 
 ---
 
@@ -145,12 +147,12 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 
 *(Podrobnosti v `Tech Stack Document (MVP v1.0.0)`)*
 
-* **Frontend:** Expo React Native, TypeScript, Expo Router, NativeWind, React Core APIs (State), knjižnice za STT/TTS (npr. Expo Speech, @react-native-voice/voice).
+* **Frontend:** Expo React Native, TypeScript, Expo Router, NativeWind, React Core APIs (State), knjižnice za STT/TTS (npr. Google Cloud).
 * **Backend:** Supabase (Auth, PostgreSQL z `pgvector`, Edge Functions - Deno/TypeScript).
-* **AI Klepet:** Google Gemini 2.0 Flash (preko Edge Functions).
+* **AI Klepet:** **OpenAI API** (Modeli: **`o4-mini`**, **`40 mini`**) [cite: 13, 15] (preko Edge Functions).
 * **Embeddings:** Supabase AI vgrajen model (`gte-small`) (preko Edge Functions).
 * **Avtentikacija:** Supabase Auth (Email/Pass, Apple).
-* **Primarni API-ji:** Supabase API, Google Gemini API, API-ji za STT/TTS (odvisno od izbrane knjižnice).
+* **Primarni API-ji:** Supabase API, **OpenAI API**, API-ji za STT/TTS (Google Cloud).
 
 ---
 
@@ -178,8 +180,8 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 ### 7.2. Varnost
 * **Avtentikacija:** Varna implementacija Apple Sign In in Email/Password preko Supabase Auth.
 * **Avtorizacija:** Stroga uporaba Row Level Security (RLS) v Supabase za zagotovitev, da uporabniki dostopajo le do svojih podatkov.
-* **Prenos Podatkov:** Vsa komunikacija med klientom, Supabase in Gemini API mora potekati preko varne (HTTPS/WSS) povezave.
-* **Shranjevanje Ključev:** API ključi (Supabase service_role, Gemini) morajo biti varno shranjeni kot skrivnosti (secrets) v Supabase in nikoli izpostavljeni na klientu.
+* **Prenos Podatkov:** Vsa komunikacija med klientom, Supabase in **OpenAI API** mora potekati preko varne (HTTPS/WSS) povezave.
+* **Shranjevanje Ključev:** API ključi (Supabase service_role, **OpenAI**) morajo biti varno shranjeni kot skrivnosti (secrets) v Supabase in nikoli izpostavljeni na klientu.
 * **Zasebnost Podatkov:** Upoštevanje načel zasebnosti pri oblikovanju in implementaciji (glej Politiko Zasebnosti).
 
 ---
@@ -189,12 +191,12 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 ### 8.1. Omejitve
 * **Ekipa:** Razvoj izvaja ena oseba.
 * **Časovnica:** Razvoj MVP-ja mora biti zaključen in aplikacija poslana v pregled na App Store **v roku 1 meseca** od začetka.
-* **Proračun:** Ni specificiran; predvideva se uporaba brezplačnih ali "pay-as-you-go" nivojev storitev (Supabase, Gemini, STT/TTS API-ji), dokler je mogoče in stroškovno učinkovito za MVP.
+* **Proračun:** Ni specificiran; predvideva se uporaba brezplačnih ali "pay-as-you-go" nivojev storitev (Supabase, **OpenAI**, STT/TTS API-ji), dokler je mogoče in stroškovno učinkovito za MVP.
 * **Obseg MVP:** Strogo omejen na zgoraj definirane funkcionalnosti v sekciji 4.1.
 
 ### 8.2. Predpostavke
 * **Uporabniki:** Razumejo, da aplikacija ni nadomestilo za profesionalno terapijo. So tehnično dovolj pismeni za uporabo mobilne aplikacije, vključno z glasovnimi funkcijami. So pripravljeni na reflektivno komunikacijo z AI (tekstovno ali glasovno). Najdejo vrednost v AI Racionalnem Prijatelju za pomoč pri overthinkanju.
-* **Tehnologija:** Supabase in Google Gemini API bosta zagotavljala zanesljive in dovolj zmogljive storitve po sprejemljivih cenah za MVP obseg. Izbrani tehnični sklop (Expo RN, Supabase AI Embeddings, STT/TTS knjižnice) je primeren za implementacijo zahtevanih funkcionalnosti.
+* **Tehnologija:** Supabase in **OpenAI API** bosta zagotavljala zanesljive in dovolj zmogljive storitve po sprejemljivih cenah za MVP obseg. Izbrani tehnični sklop (Expo RN, Supabase AI Embeddings, STT/TTS knjižnice) je primeren za implementacijo zahtevanih funkcionalnosti.
 * **Razvoj:** Ena oseba lahko obvlada kompleksnost razvoja MVP-ja v zastavljenem 1-mesečnem roku.
 
 ---
@@ -204,9 +206,9 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 * **Tehnična Tveganja:**
     * Kompleksnost implementacije Memory/Context sistema s prepoznavanjem vzorcev in RAG (zagotavljanje relevance in zmogljivosti).
     * Zanesljivost/latenca/stroški Supabase storitev (DB, Auth, Edge Functions, AI Embeddings).
-    * Zanesljivost/latenca/stroški/omejitve Gemini 2.0 Flash API.
-    * Zanesljivost/latenca/stroški/kakovost izbranih STT in TTS rešitev/API-jev.
-    * Izzivi pri integraciji vseh komponent (RN -> STT -> Edge Function -> Gemini -> DB -> RAG -> Edge Function -> TTS -> RN).
+    * Zanesljivost/latenca/stroški/omejitve **OpenAI API (modeli `o4-mini`, `40 mini`)**[cite: 11, 27].
+    * Zanesljivost/latenca/stroški/kakovost izbranih STT in TTS rešitev/API-jev (Google Cloud).
+    * Izzivi pri integraciji vseh komponent (RN -> STT -> Edge Function -> **OpenAI** -> DB -> RAG -> Edge Function -> TTS -> RN).
     * Časovna omejitev (1 mesec) za implementacijo vseh funkcij, vključno z novimi (STT/TTS, avatarji, vzorci).
 * **Tveganja Uporabniške Izkušnje:**
     * AI odgovori niso dovolj koristni, relevantni ali empatični kljub kontekstu in avatarjem.
@@ -214,7 +216,7 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
     * UI/UX ni dovolj intuitiven ali prijeten za uporabo, še posebej z glasovnimi funkcijami.
     * Kakovost STT ali TTS ni zadovoljiva.
 * **Tveganja Odvisnosti:**
-    * Spremembe v Supabase, Gemini, STT/TTS API-jih, ki zahtevajo prilagoditve kode.
+    * Spremembe v Supabase, **OpenAI**, Google Cloud STT/TTS API-jih, ki zahtevajo prilagoditve kode.
     * Morebitne omejitve ali skriti stroški brezplačnih/plačljivih nivojev storitev.
 * **Varnostna Tveganja:**
     * Nenamerno razkritje občutljivih podatkov zaradi napak v RLS politikah ali kodi.

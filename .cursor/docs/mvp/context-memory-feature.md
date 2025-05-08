@@ -1,196 +1,214 @@
-# Rational Mind App - Memory / Context Feature Document (MVP v2.0.0)
+# Rational Mind App - Memory / Context Feature Document (MVP v2.0.1 - OpenAI Models & Caching)
 
-Below is a rigorously-structured, end-to-end specification for the NEW Memory & Context system (v2) that replaces the former "Sports-Psychologist" design with the "Overthinking Buddy / Rational-Mind Helper" model and incorporates caching, new pattern & people entities, and the revised session workflow.
+Below is a rigorously-structured, end-to-end specification for the NEW Memory & Context system (v2) that replaces the former "Sports-Psychologist" design with the "Overthinking Buddy / Rational-Mind Helper" model, incorporates caching, new pattern & people entities, the revised session workflow, and uses **OpenAI models**.
 Read it top-to-bottom; every requirement is explicit and cross-referenced with existing DB tables so implementation can begin immediately.
 
 ----------------------------------------------------------------------------------------------------
 1. PURPOSE & SCOPE
 ----------------------------------------------------------------------------------------------------
-• Goal Build a performant, highly-personalised context engine that powers 3-5 "Overthinking Buddy" avatars in the Rational Mind MVP.
+• Goal: Build a performant, highly-personalised context engine that powers 3-5 "Overthinking Buddy" avatars in the Rational Mind MVP, using **OpenAI models (`o4-mini`, `40 mini`)**.
 • Key differences from v1
   – No manual/auto "End Session" button; pressing "New Session" automatically finishes the previous one.
-  – Static / Dynamic component split with Gemini Cache usage to avoid resending redundant context.
+  – Static / Dynamic component split. Caching handled by client/edge-function logic (see Section 4).
   – New semantic entities: Patterns and People.
   – Domain knowledge switches from sports-psychology to overthinking-management.
+  – **AI Models:** Uses **`o4-mini`** for paying users and **`40 mini`** for free/no-account users.
 
 ----------------------------------------------------------------------------------------------------
 2. DATA ENTITIES & DB MAPPING
 ----------------------------------------------------------------------------------------------------
 (Existing table columns referenced are already present; new/updated columns noted with *).
 
-**A. STATIC COMPONENTS (sent ONCE, cached for entire session)**
+**A. STATIC COMPONENTS (sent with relevant chat turns, potential for static prompt caching)**
 
-*   **System Prompt (avatar-specific):**
-    *   *Supabase Source:* `ai_knowledge.system_prompt`
-    *   *Notes:* The chosen avatar determines which prompt is used (1:1 mapping).
-*   **Static User Profile:**
-    *   *Supabase Source:* All non-dynamic fields in the `profiles` table (e.g., onboarding answers).
-    *   *Notes:* Immutable data collected during onboarding.
-*   **Dynamic User Profile:**
-    *   *Supabase Source:* `profiles.dynamic_profile`
-    *   *Notes:* Updated after each session, but treated as static *within* a given session for consistency.
-*   **Main Pattern:**
-    *   *Supabase Source:* `profiles.main_pattern`
-    *   *Notes:* A summary of the user's long-term cognitive patterns identified by the AI.
+* **System Prompt (avatar-specific):**
+    * *Supabase Source:* `ai_knowledge.system_prompt`
+    * *Notes:* The chosen avatar determines which prompt is used (1:1 mapping). Included in the `messages` array sent to OpenAI. Potentially benefits from OpenAI Static Prompt Caching.
+* **Static User Profile:**
+    * *Supabase Source:* All non-dynamic fields in the `profiles` table (e.g., onboarding answers).
+    * *Notes:* Immutable data collected during onboarding. Included in context for relevant turns. Potentially benefits from OpenAI Static Prompt Caching if consistently prepended.
+* **Dynamic User Profile:**
+    * *Supabase Source:* `profiles.dynamic_profile`
+    * *Notes:* Updated after each session, but treated as static *within* a given session for consistency. Included in context for relevant turns. Less likely to benefit from static caching due to updates.
+* **Main Pattern:**
+    * *Supabase Source:* `profiles.main_pattern`
+    * *Notes:* A summary of the user's long-term cognitive patterns identified by the AI. Included in context for relevant turns. Less likely to benefit from static caching due to updates.
 
 **B. DYNAMIC COMPONENTS (queried via RAG on each user message)**
 
-*   **Session Summaries:**
-    *   *Supabase Source:* `sessions.summary`
-    *   *Embedding Column:* `sessions.summary_embedding`
-    *   *Retrieval Key:* Similarity search based on user message embedding.
-    *   *Extra Notes:* Recommend retrieving the last N=3 summaries for context.
-*   **Session Patterns:**
-    *   *Supabase Source:* `sessions.patterns`
-    *   *Embedding Column:* `sessions.patterns_embedding`
-    *   *Retrieval Key:* Similarity search based on user message embedding.
-    *   *Extra Notes:* These are bullet-list patterns extracted from each session.
-*   **People:**
-    *   *Supabase Source:* `people.description`
-    *   *Embedding Column:* `*people.name_embedding*` (NEW - Embed the name for lookup)
-    *   *Retrieval Key:* Primarily **exact name match** (case-insensitive) against tokens in the user message. If ambiguous or no exact match, fall back to nearest-neighbor search using the name embedding.
-    *   *Extra Notes:* See section §5.b for the detailed disambiguation strategy.
-*   **AI Knowledge (Overthinking Domain):**
-    *   *Supabase Source:* `ai_knowledge.knowledge_text`
-    *   *Embedding Column:* `ai_knowledge.knowledge_embedding`
-    *   *Retrieval Key:* Similarity search based on user message embedding, filtered by the selected `avatar_name`.
-    *   *Extra Notes:* Contains information and techniques related to managing overthinking.
+* **Session Summaries:**
+    * *Supabase Source:* `sessions.summary`
+    * *Embedding Column:* `sessions.summary_embedding`
+    * *Retrieval Key:* Similarity search based on user message embedding.
+    * *Extra Notes:* Recommend retrieving the last N=3 summaries for context.
+* **Session Patterns:**
+    * *Supabase Source:* `sessions.patterns`
+    * *Embedding Column:* `sessions.patterns_embedding`
+    * *Retrieval Key:* Similarity search based on user message embedding.
+    * *Extra Notes:* These are bullet-list patterns extracted from each session.
+* **People:**
+    * *Supabase Source:* `people.description`
+    * *Embedding Column:* `*people.name_embedding*` (NEW - Embed the name for lookup)
+    * *Retrieval Key:* Primarily **exact name match** (case-insensitive) against tokens in the user message. If ambiguous or no exact match, fall back to nearest-neighbor search using the name embedding.
+    * *Extra Notes:* See section §5.b for the detailed disambiguation strategy.
+* **AI Knowledge (Overthinking Domain):**
+    * *Supabase Source:* `ai_knowledge.knowledge_text`
+    * *Embedding Column:* `ai_knowledge.knowledge_embedding`
+    * *Retrieval Key:* Similarity search based on user message embedding, filtered by the selected `avatar_name`.
+    * *Extra Notes:* Contains information and techniques related to managing overthinking.
 
-**C. LIVE COMPONENTS (always part of the immediate context/cache)**
+**C. LIVE COMPONENTS (always part of the immediate context)**
 
-*   **Current User Message:** The latest message sent by the user.
-*   **Current Session Chat History:** The full sequence of user/AI messages for the active session (stream-added to cache).
-*   **Current AI Response:** The latest response generated by the AI (also cached).
-
-----------------------------------------------------------------------------------------------------
-3. SESSION LIFECYCLE & EDGE-FUNCTION FLOW
-----------------------------------------------------------------------------------------------------
-Legend  EF = Edge Function
-
-1. Create New Session
-  • Client presses "Start New Session".
-  • EF `create_session` marks any ACTIVE session → COMPLETED, stamps `ended_at`, triggers `process_session_end` (async).
-  • EF inserts new row in `sessions` (status=ACTIVE), returns `session_id`.
-
-2. First User Message
-  • Client → EF `gemini_chat` payload: {session_id, user_id, text}.
-  • `gemini_chat` assembles CONTEXT-FIRST-TURN:
-      – Static set (A) pulled, hashed → StaticCacheKey.
-      – Sends entire Static + RAG(Dynamic) + user msg to Gemini using the Gemini SDK caching mechanism (associating with StaticCacheKey).
-      – Gemini returns stream; EF relays SSE back, stores AI/user messages in `messages`, pushes both into **ConversationCache** via SDK.
-
-3. Subsequent Messages (Turn-by-Turn)
-  • `gemini_chat` fetches Dynamic set via pgvector searches:
-      – Top-k (k=3 default) matches from each Dynamic component table (Patterns, Summaries, People, Knowledge) using similarity threshold θ=0.75 default.
-  • Static set NOT resent (Gemini cache hit implied by SDK usage).
-  • Context = {Dynamic matches, latest user msg}.
-  • Gemini called with ConversationCache identifier so model has full prior chat history.
-  • AI response returned, persisted, appended to cache via SDK.
-
-4. Process Session End (async EF `process_session_end`)
-  A. Generate 300-400w summary → `sessions.summary`, plus embedding.
-  B. Extract bullet-pattern list → `sessions.patterns`, plus embedding.
-  C. Update `profiles.dynamic_profile` and `profiles.main_pattern` (Gemini prompt with old + new data).
-  D. Extract **People**:
-      – Give Gemini entire chat; ask for unique people names + 1-sentence description each.
-      – For each name: if exists (`people.user_id + lower(name)`), UPDATE description (append new info); else INSERT row and compute `name_embedding`.
+* **Current User Message:** The latest message sent by the user.
+* **Current Session Chat History:** The sequence of user/AI messages for the active session (sent as part of the `messages` array to OpenAI).
+* **Current AI Response:** The latest response generated by the AI.
 
 ----------------------------------------------------------------------------------------------------
-4. GEMINI CACHING STRATEGY
+3. SESSION LIFECYCLE & EDGE-FUNCTION FLOW (`openai-chat`)
 ----------------------------------------------------------------------------------------------------
-• **Static Cache Key Generation:** Implicitly handled by the Gemini SDK when creating the initial `CachedContent`. The SDK likely uses a combination of model name, system instruction, and initial content hashes.
-• **Initial Call:** Use the SDK to create `CachedContent` with the static components (Section 2.A).
-• **Conversation Cache:** Subsequent calls reference the `CachedContent` object/identifier provided by the SDK. User/AI messages are added turn-by-turn via the SDK, managing the history.
-• **Estimated Token Savings:** ~60-70 % after the first turn due to caching static data and chat history.
+Legend: EF = Edge Function
+
+1.  **Create New Session**
+    * Client presses "Start New Session".
+    * EF `create_session` marks any ACTIVE session → COMPLETED, stamps `ended_at`, triggers `process_session_end` (async).
+    * EF inserts new row in `sessions` (status=ACTIVE), returns `session_id`.
+
+2.  **User Message**
+    * Client → EF `openai_chat` payload: `{session_id, user_id, text, avatar_name}`.
+    * `openai_chat` determines the user tier (No Account, Free, Paying) based on `user_id`.
+    * `openai_chat` selects the **appropriate OpenAI model (`o4-mini` or `40 mini`)** based on the tier.
+    * `openai_chat` retrieves chat history for `session_id` from `messages` table.
+    * `openai_chat` retrieves Static context components (A) for the user.
+    * `openai_chat` performs RAG search (if tier allows):
+        * Generates embedding for user message (`text`).
+        * Calls RAG search functions for Dynamic components (B).
+    * `openai_chat` constructs the `messages` array for OpenAI:
+        * Includes System Prompt.
+        * Includes relevant retrieved Static and Dynamic (RAG) context woven into the history or as part of a contextual preamble.
+        * Includes the **truncated** chat history (essential for managing token limits).
+        * Includes the current user message (`text`).
+    * `openai_chat` calls OpenAI Completions API with the selected model, the constructed `messages` array, and `stream: true`.
+    * OpenAI returns stream; EF parses the stream, relays SSE back to the client, stores User/AI messages in `messages` table.
+
+3.  **Process Session End (async EF `process_session_end`)**
+    A.  Determine user tier (Free or Paying).
+    B.  Select the appropriate OpenAI model (`o4-mini` for Paying, `40 mini` for Free).
+    C.  Fetch full chat history for the session.
+    D.  Call OpenAI to generate summary → `sessions.summary`, plus embedding.
+    E.  Call OpenAI to extract patterns → `sessions.patterns`, plus embedding.
+    F.  Call OpenAI to update `profiles.dynamic_profile` and `profiles.main_pattern`.
+    G.  Call OpenAI to extract **People**:
+        * Process described in section 3.
+
+----------------------------------------------------------------------------------------------------
+4. MODEL & CACHING STRATEGY
+----------------------------------------------------------------------------------------------------
+* **Model Selection:** Done within the `openai-chat` Edge Function based on user tier look-up.
+    * Tier 0 (No Account): `40 mini` for chat.
+    * Tier 1 (Free): `40 mini` for chat and background processing.
+    * Tier 2 (Paying): `o4-mini` for chat and background processing.
+* **Caching:**
+    * **OpenAI Static Prompt Caching:** OpenAI offers caching for the *static prefix* of a prompt (like system message + initial user context) on some models (e.g., `gpt-4-turbo-preview`, `gpt-4-0125-preview`, `gpt-3.5-turbo-0125`). If the exact same prefix tokens are sent repeatedly, OpenAI *may* reuse cached results, potentially reducing token costs for that prefix. The `prompt_filter_results` in the response indicates if caching was applied. **This is NOT a stateful conversational cache like Gemini's `CachedContent`.** It only optimizes repeated static prefixes.
+    * **Application-Level Caching:**
+        * **Chat History:** Must be explicitly fetched from the `messages` table by the `openai-chat` function and included in the `messages` array sent to OpenAI on each turn. **Implementing effective history truncation is critical.**
+        * **Static/Dynamic Context:** Must be fetched (DB lookups, RAG searches) by the `openai-chat` function on each relevant turn and included in the `messages` array. There's no built-in OpenAI mechanism to cache this across turns. Short-term caching within the Edge Function instance *might* be possible but unreliable across invocations.
 
 ----------------------------------------------------------------------------------------------------
 5. RAG IMPLEMENTATION DETAILS
 ----------------------------------------------------------------------------------------------------
-a) Embeddings
-  • Model: `gte-small` (512-d).
-  • All relevant textual columns in Section 2.B should have a parallel `_embedding` vector column (`vector(512)`).
-  • Use cosine distance for similarity (`<=>` operator in pgvector).
-  • Index: Use `ivfflat` with appropriate `lists` (e.g., 100) and `probes` (e.g., 10) settings on embedding columns (`CREATE INDEX ON table USING ivfflat (embedding_column vector_cosine_ops) WITH (lists = 100);`).
+a) **Embeddings**
+    * Model: Supabase AI `gte-small` (512-d).
+    * All relevant textual columns in Section 2.B should have a parallel `_embedding` vector column (`vector(512)`).
+    * Use cosine distance for similarity (`<=>` operator in pgvector).
+    * Index: Use `ivfflat` with appropriate `lists` (e.g., 100) and `probes` (e.g., 10).
 
-b) People Disambiguation
-  Problem: duplicate names ("John").
-  Solution (MVP):
-   1. Primary key for lookup = (`user_id`, `lower(name)`).
-   2. RAG retrieval: first try **exact case-insensitive match** of tokens in user message against the `people.name` column. If one unique match is found, retrieve its description. If zero or multiple matches, fallback to nearest-vector search on `people.name_embedding` to find the most semantically relevant person based on the user message context.
-   3. Advanced alias management (e.g., user-defined aliases, qualifier extraction like "Dad-(work)") is **deferred post-MVP**.
+b) **People Disambiguation**
+    * Problem: duplicate names ("John").
+    * Solution (MVP):
+        1.  Primary key for lookup = (`user_id`, `lower(name)`).
+        2.  RAG retrieval: first try **exact case-insensitive match** of tokens in user message against the `people.name` column. If one unique match, retrieve description. If zero/multiple matches, fallback to nearest-vector search on `people.name_embedding`.
+        3.  Alias management deferred post-MVP.
 
-c) Dynamic Retrieval Pipeline per turn (Conceptual)
+c) **Dynamic Retrieval Pipeline per turn (Conceptual - inside `openai-chat`)**
 ```typescript
-// Inside gemini_chat Edge Function
-const userMessageEmbedding = await generateEmbedding(userMessage);
-const dynamicContextResults = [];
+// Fetch user tier
+const userTier = await getUserTier(userId);
+const canUseRAG = userTier === 'Free' || userTier === 'Paying';
 
-// Fetch Summaries
-const summaries = await findRelevantSummaries(userMessageEmbedding, userId);
-dynamicContextResults.push(...summaries);
+// Fetch chat history (and truncate appropriately)
+const chatHistory = await getTruncatedChatHistory(sessionId);
 
-// Fetch Patterns
-const patterns = await findRelevantPatterns(userMessageEmbedding, userId);
-dynamicContextResults.push(...patterns);
+// Fetch static context
+const staticContext = await getStaticContext(userId, avatarName);
 
-// Fetch People (using name match + embedding fallback)
-const people = await findRelevantPeople(userMessage, userId, userMessageEmbedding);
-dynamicContextResults.push(...people);
+let dynamicContextResults = [];
+if (canUseRAG) {
+    const userMessageEmbedding = await generateEmbedding(userMessage);
+    // Fetch Summaries, Patterns, People, Knowledge...
+    // ... (RAG calls using embedding) ...
+    dynamicContextResults = await performRAGSearch(userMessageEmbedding, userId, avatarName, userMessage);
+}
 
-// Fetch AI Knowledge
-const knowledge = await findRelevantKnowledge(userMessageEmbedding, avatarName);
-dynamicContextResults.push(...knowledge);
+// Construct the 'messages' array for OpenAI
+const messagesForOpenAI = constructMessagesForOpenAI(
+    staticContext.systemPrompt,
+    staticContext, // includes profiles, main pattern
+    chatHistory,
+    dynamicContextResults,
+    userMessage
+);
 
-// Combine, de-duplicate, and potentially truncate based on token limits
-const finalDynamicContext = processAndCombineResults(dynamicContextResults);
+// Select model based on tier
+const model = selectOpenAIModel(userTier);
 
-// finalDynamicContext is then passed to Gemini along with the user message
-// and the ConversationCache identifier.
+// Call OpenAI API
+// const stream = await callOpenAI(model, messagesForOpenAI);
 ```
-*Note: Assumes helper functions like `findRelevantSummaries`, `findRelevantPatterns` etc. encapsulating the pgvector queries with k=3, θ=0.75 defaults.*
+*Note: Assumes helper functions like `getTruncatedChatHistory`, `performRAGSearch`, etc.*
 
 ----------------------------------------------------------------------------------------------------
 6. EDGE FUNCTIONS RESPONSIBILITIES
 ----------------------------------------------------------------------------------------------------
-• `gemini-chat`: Handles the main chat loop, context assembly per turn (static cache creation on first turn, dynamic RAG on subsequent turns), interaction with Gemini SDK (caching, generation), SSE streaming.
-• `create-session`: Manages atomic start/end of sessions, triggers background processing.
-• `process-session-end`: Runs asynchronously post-session to generate summaries, extract patterns, update profiles, and manage people entries.
-• `generate-embeddings`: Shared utility function for creating embeddings using Supabase AI.
-• `rag-search`: Potentially a set of shared utility functions for specific pgvector queries (e.g., search summaries, search patterns, search people, search knowledge).
+* `openai-chat`: Handles the main chat loop, user tier detection, model selection, context assembly (history, static, RAG), **history truncation**, interaction with **OpenAI API** (streaming), SSE streaming, message persistence.
+* `create-session`: Manages atomic start/end of sessions, triggers background processing.
+* `process-session-end`: Runs asynchronously post-session. Selects model based on tier (`o4-mini`/`40 mini`). Generates summaries, extracts patterns, updates profiles, manages people entries using the appropriate OpenAI model.
+* `generate-embeddings`: Shared utility function using Supabase AI.
+* `rag-search`: Set of shared utility functions for pgvector queries.
 
 ----------------------------------------------------------------------------------------------------
 7. TOKEN BUDGET GUIDELINES
 ----------------------------------------------------------------------------------------------------
-• **Static Block (Cached):** Aim for ≤ 800 tokens (includes system prompt, profiles, main pattern). Sent only once.
-• **Per-turn Dynamic RAG Block:** Target ≤ 500 tokens (retrieved summaries, patterns, people descriptions, knowledge snippets).
-• **Chat History:** Managed by Gemini via Conversation Cache; minimal token cost on the wire for subsequent turns.
-• **User Message + AI Response:** Variable, depends on interaction length.
+* **Context Block (Static + RAG):** Aim for ≤ 800 tokens combined.
+* **Chat History:** Variable. **Requires robust truncation** (e.g., keep last N turns or tokens) to fit within model context window (e.g., `o4-mini` has 128k context, `40 mini` TBD but likely similar).
+* **User Message + AI Response:** Variable.
 
 ----------------------------------------------------------------------------------------------------
-8. DECISIONS SUMMARY (Formerly Open Questions)
+8. DECISIONS SUMMARY (Reflecting OpenAI Switch)
 ----------------------------------------------------------------------------------------------------
-*   **Gemini Cache API:** Utilize the **official Gemini SDK's caching mechanism** within Edge Functions. Follow current SDK best practices for creating and reusing `CachedContent`.
-*   **RAG Thresholds:** Default to **`k = 3`** (top matches per source) and **`θ = 0.75`** (cosine similarity threshold). Make these easily configurable (e.g., environment variables) for post-launch tuning.
-*   **People Name Aliases:** **Defer** advanced alias strategy post-MVP. Rely on exact name match + vector search fallback for MVP.
-*   **Data Pruning:** **Defer** implementation of background pruning jobs post-MVP. Monitor performance and storage first.
+* **AI API:** Switched to **OpenAI API**.
+* **Models:** Using **`o4-mini`** and **`40 mini`** based on user tier.
+* **Caching:** Primarily application-managed. **Chat history must be fetched and truncated by the Edge Function**. OpenAI's *Static Prompt Caching* might provide minor optimization for the static prompt prefix if applicable models are used, but doesn't replace the need for manual history/context management.
+* **RAG Thresholds:** Default to **`k = 3`** and **`θ = 0.75`**. Configurable.
+* **People Name Aliases:** **Defer** post-MVP. Use exact match + vector fallback.
+* **Data Pruning:** **Defer** post-MVP.
 
 ----------------------------------------------------------------------------------------------------
 9. SUCCESS CRITERIA
 ----------------------------------------------------------------------------------------------------
-✔ First-turn latency < 4 seconds average (includes static cache creation).
-✔ Subsequent-turn latency < 1.5 seconds average (leveraging cache).
-✔ ≥ 85% of AI replies reference at least one relevant dynamic context source (Pattern, Summary, Person, Knowledge) when appropriate (verified through logging and manual evaluation).
-✔ Database costs remain within reasonable limits for the MVP scale (monitor Supabase usage, especially compute for Edge Functions and pgvector index size).
+✔ Latency per turn remains acceptable.
+✔ ≥ 85% of AI replies reference relevant dynamic context source when appropriate.
+✔ Token usage and OpenAI costs are monitored and within acceptable bounds. Set up budget alerts. Implement effective history truncation.
+✔ Database costs remain within reasonable limits.
 
 ----------------------------------------------------------------------------------------------------
-10. IMPLEMENTATION ORDER (HIGH-LEVEL TASKS)
+10. IMPLEMENTATION ORDER (HIGH-LEVEL TASKS - Post-Switch)
 ----------------------------------------------------------------------------------------------------
-1.  **Database Schema:** Update tables (`people`, `ai_knowledge`, `sessions`, `profiles`) to include necessary text and embedding columns (`vector(512)`). Create `ivfflat` indexes on embedding columns.
-2.  **Edge Function (`create-session`):** Implement logic to mark old sessions complete and start a new one, triggering `process-session-end`.
-3.  **Edge Function (`generate-embeddings` & RAG Utilities):** Create shared function for embedding generation and helper functions for querying each dynamic data source via pgvector.
-4.  **Edge Function (`gemini-chat`):** Implement core logic with Gemini SDK integration: static cache creation on first message, dynamic RAG on subsequent messages, conversation history caching.
-5.  **Edge Function (`process-session-end`):** Implement background processing: summary generation, pattern extraction, profile updates, people extraction/update (including embedding new names).
-6.  **Testing:** Write Deno tests for RAG functions (accuracy, thresholds) and core Edge Function logic (cache hits, context assembly).
-7.  **Content Loading:** Load initial AI knowledge base content and embeddings for each avatar.
-8.  **Client Integration:** Update React Native app to call the new `create-session` and `gemini-chat` endpoints correctly, handling SSE stream.
-9.  **Deployment & Monitoring:** Deploy functions, configure environment variables (thresholds, API keys), set up logging/monitoring. Performance test and tune thresholds as needed.
+1.  **Database Schema:** Verify tables/indexes.
+2.  **Edge Function (`create-session`):** Verify logic.
+3.  **Edge Function (`generate-embeddings` & RAG Utilities):** Verify logic.
+4.  **Edge Function (`openai-chat`):** Implement core logic including **tier detection, model selection, history retrieval/truncation, context assembly, OpenAI streaming call**.
+5.  **Edge Function (`process-session-end`):** Implement background processing using correct models based on tier.
+6.  **Testing:** Write Deno tests for RAG, core Edge Function logic (esp. truncation), and tier model selection.
+7.  **Content Loading:** Load AI knowledge base content/embeddings.
+8.  **Client Integration:** Update RN app to call endpoints, handle SSE.
+9.  **Deployment & Monitoring:** Deploy, configure env vars, set up monitoring, especially for **OpenAI costs and token usage**.
