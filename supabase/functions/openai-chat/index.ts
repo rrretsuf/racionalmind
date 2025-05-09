@@ -1,5 +1,11 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"; 
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { corsHeaders } from "../_shared/cors.ts";
+import { logger } from "../_shared/logger.ts";
+
+// Declare Supabase type if not globally available through Deno/Supabase environment
+// This allows using Supabase.ai.Session
+declare const Supabase: any; 
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
 const OPENAI_MODEL = "o4-mini-2025-04-16";
@@ -8,6 +14,7 @@ const OPENAI_MODEL = "o4-mini-2025-04-16";
 class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
   private accumulatedData = "";
   private encoder = new TextEncoder();
+  public accumulatedResponseForDb = "";
 
   constructor() {
     super({
@@ -31,6 +38,7 @@ class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
               const deltaContent = parsed.choices?.[0]?.delta?.content;
 
               if (deltaContent) {
+                this.accumulatedResponseForDb += deltaContent;
                 const clientSseMsg = `data: ${JSON.stringify({ text: deltaContent })}\n\n`;
                 controller.enqueue(this.encoder.encode(clientSseMsg));
               }
@@ -40,14 +48,14 @@ class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
               // }
 
             } catch (e) {
-              console.error("Error parsing OpenAI JSON chunk:", e, "Chunk content:", dataContent);
+              logger.error("Error parsing OpenAI JSON chunk:", e, "Chunk content:", dataContent);
               // Send an error chunk to the client
               const errorMsg = `data: ${JSON.stringify({ error: "Error processing stream data" })}\n\n`;
-              try { controller.enqueue(this.encoder.encode(errorMsg)); } catch (enqueueError) { console.error("Failed to enqueue parse error:", enqueueError); }
+              try { controller.enqueue(this.encoder.encode(errorMsg)); } catch (enqueueError) { logger.error("Failed to enqueue parse error:", enqueueError); }
             }
           } else if (line.trim()) {
              // Log lines that don't start with 'data: ' but are not empty
-             console.warn("Received non-data line from OpenAI:", line);
+             logger.warn("Received non-data line from OpenAI:", line);
           }
         }
       },
@@ -59,10 +67,32 @@ class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
 serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log("Handling OPTIONS request");
+    logger.debug("Handling OPTIONS request");
     return new Response('ok', { headers: corsHeaders });
   }
-  console.log(`Received ${req.method} request`);
+  logger.debug(`Received ${req.method} request`);
+
+  // Initialize Supabase client
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !supabaseServiceRoleKey) {
+    logger.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env variables.");
+    return new Response(JSON.stringify({ error: "Server configuration error: Supabase client not configured." }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const supabase: SupabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey);
+
+  // Initialize Embedding Model Session
+  let embeddingModel: any;
+  try {
+    embeddingModel = new Supabase.ai.Session('gte-small');
+  } catch (e) {
+    logger.error("Failed to initialize Supabase.ai.Session for embeddings:", e);
+    // Decide if this is fatal or if we can proceed without embeddings
+    // For now, proceed and embeddings will be null.
+  }
 
   try {
     // --- Authentication & Parameter Validation ---.
@@ -79,28 +109,61 @@ serve(async (req: Request) => {
          !userId && "user_id"
        ].filter(Boolean).join(", ");
 
-       console.error(`Request missing parameters: ${missingParams}`);
+       logger.error(`Request missing parameters: ${missingParams}`);
        return new Response(JSON.stringify({ error: `Missing required query parameters: ${missingParams}` }), {
          status: 400,
          headers: { ...corsHeaders, "Content-Type": "application/json" },
        });
      }
-     console.log(`Processing request: user_id=${userId}, session_id=${sessionId}`);
+     logger.debug(`Processing request: user_id=${userId}, session_id=${sessionId}`);
 
 
     // --- OpenAI Key Check ---
     if (!OPENAI_API_KEY) {
-      console.error('FATAL: Missing OPENAI_API_KEY environment variable.');
+      logger.error('FATAL: Missing OPENAI_API_KEY environment variable.');
       return new Response(JSON.stringify({ error: "Server configuration error: OpenAI API key not set." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    // --- Generate User Message Embedding ---
+    let userMessageEmbedding = null;
+    if (embeddingModel && userMessageText) {
+      try {
+        logger.debug("Generating embedding for user message...");
+        const embeddingResult = await embeddingModel.run(userMessageText, { mean_pool: true, normalize: true });
+        userMessageEmbedding = embeddingResult; // Assuming result is the embedding itself
+        logger.debug("User message embedding generated.");
+      } catch (embedError) {
+        logger.error('Failed to generate embedding for user message:', embedError);
+      }
+    }
+
+    // --- Save User Message ---
+    try {
+      const { error: userMessageError } = await supabase
+        .from('messages')
+        .insert({
+          session_id: sessionId,
+          user_id: userId,
+          sender_role: 'user',
+          content_text: userMessageText,
+          content_embedding: userMessageEmbedding,
+        });
+      if (userMessageError) {
+        logger.error('Failed to save user message:', userMessageError);
+      } else {
+        logger.debug('User message saved successfully.');
+      }
+    } catch (dbError) {
+      logger.error('Unexpected error saving user message:', dbError);
+    }
+
     // --- TODO: Implement Chat History & RAG Context Retrieval ---
     // Fetch history/context based on userId and sessionId BEFORE constructing messages
     // const messagesToOpenAI = await constructMessagesWithHistory(userId, sessionId, userMessageText);
-    console.log("Skipping history/RAG lookup for now."); // Placeholder log
+    logger.debug("Skipping history/RAG lookup for now."); // Placeholder log
 
     // --- Construct OpenAI Request ---
     const messages = [
@@ -117,7 +180,7 @@ serve(async (req: Request) => {
       stream: true,
       max_completion_tokens: 300,
     };
-    console.log("Sending payload to OpenAI:", JSON.stringify(openaiPayload, null, 2));
+    logger.debug("Sending payload to OpenAI:", JSON.stringify(openaiPayload, null, 2));
 
 
     // --- Fetch from OpenAI ---
@@ -130,18 +193,18 @@ serve(async (req: Request) => {
       },
       body: JSON.stringify(openaiPayload),
     });
-    console.log(`OpenAI response status: ${openaiResponse.status}`);
+    logger.debug(`OpenAI response status: ${openaiResponse.status}`);
 
 
     // --- Handle OpenAI Errors ---
      if (!openaiResponse.ok || !openaiResponse.body) {
        const errorBodyText = await openaiResponse.text();
-       console.error("OpenAI API Error:", { status: openaiResponse.status, statusText: openaiResponse.statusText, body: errorBodyText });
+       logger.error("OpenAI API Error:", { status: openaiResponse.status, statusText: openaiResponse.statusText, body: errorBodyText });
        let errorDetail = errorBodyText;
        try {
          errorDetail = JSON.parse(errorBodyText);
         } catch {
-          console.warn("OpenAI error response body was not valid JSON.");
+          logger.warn("OpenAI error response body was not valid JSON.");
         }
 
        return new Response(JSON.stringify({ error: "OpenAI API request failed", details: errorDetail }), {
@@ -151,24 +214,63 @@ serve(async (req: Request) => {
      }
 
     // --- Pipe the Stream ---
-    console.log("OpenAI request successful, starting stream piping...");
+    logger.debug("OpenAI request successful, starting stream piping...");
+    const openAIStreamParserInstance = new OpenAIStreamParser();
     const stream = openaiResponse.body
       .pipeThrough(new TextDecoderStream()) 
-      .pipeThrough(new OpenAIStreamParser()) 
+      .pipeThrough(openAIStreamParserInstance)
       .pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
-        flush(controller) {
-          console.log("Source stream ended, flushing final client [DONE] marker.");
+        async flush(controller) {
+          logger.debug("Source stream ended, flushing final client [DONE] marker.");
           try {
               controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"));
           } catch (e) {
-             console.error("Error enqueuing final [DONE] in flush:", e);
+             logger.error("Error enqueuing final [DONE] in flush:", e);
+          }
+
+          // --- Save AI Message ---
+          const aiMessageText = openAIStreamParserInstance.accumulatedResponseForDb;
+          let aiMessageEmbedding = null;
+
+          if (embeddingModel && aiMessageText && aiMessageText.trim() !== "") {
+            try {
+              logger.debug("Generating embedding for AI message...");
+              const embeddingResult = await embeddingModel.run(aiMessageText, { mean_pool: true, normalize: true });
+              aiMessageEmbedding = embeddingResult;
+              logger.debug("AI message embedding generated.");
+            } catch (embedError) {
+              logger.error('Failed to generate embedding for AI message:', embedError);
+            }
+          }
+          
+          if (aiMessageText && aiMessageText.trim() !== "") {
+            try {
+              const { error: aiMessageError } = await supabase
+                .from('messages')
+                .insert({
+                  session_id: sessionId,
+                  user_id: userId,
+                  sender_role: 'ai',
+                  content_text: aiMessageText,
+                  content_embedding: aiMessageEmbedding,
+                });
+              if (aiMessageError) {
+                logger.error('Failed to save AI message:', aiMessageError);
+              } else {
+                logger.debug('AI message saved successfully.');
+              }
+            } catch (dbError) {
+              logger.error('Unexpected error saving AI message:', dbError);
+            }
+          } else {
+            logger.warn("AI response was empty or whitespace, not saving to DB.");
           }
         }
       }));
 
 
     // --- Return SSE Response ---
-    console.log("Returning SSE stream to client.");
+    logger.debug("Returning SSE stream to client.");
     return new Response(stream, {
       headers: {
         ...corsHeaders,
@@ -180,7 +282,7 @@ serve(async (req: Request) => {
     });
 
   } catch (error) {
-    console.error("Unhandled error in Edge Function main try-catch:", error);
+    logger.error("Unhandled error in Edge Function main try-catch:", error);
     return new Response(JSON.stringify({ error: error.message || "Internal Server Error occurred." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

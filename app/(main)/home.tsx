@@ -1,15 +1,58 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ImageBackground } from 'react-native'
-import { useRouter } from 'expo-router'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import StartSessionButton from '../../components/StartSessionButton';
 import ModuleCard from '../../components/ModuleCard';
+import { supabase } from '@/utils/supabaseClient'
 
 
 export default function Home() {
   const router = useRouter()
-
+  const [isLoading, setIsLoading] = useState(false)
   const userName = "Filip"
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsLoading(false);
+      return () => {};
+    }, [])
+  );
+
+  const handleStartSession = async () => {
+    if (isLoading) return
+    setIsLoading(true)
+
+    router.push({ pathname: '/(main)/session', params: { sessionId: 'pending' } });
+
+    try {
+      const { data: { session: authSession }, error: sessionError } = await supabase.auth.getSession()
+      if (sessionError || !authSession) {
+        console.error("Auth session error in handleStartSession:", sessionError);
+        try { router.setParams({ sessionId: 'error' }); } catch (e) { console.warn("Could not set params for error state during rapid nav", e); }
+        setIsLoading(false)
+        return
+      }
+      const accessToken = authSession.access_token
+      const response = await fetch(`${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/create-session`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      })
+      const result = await response.json()
+      if (response.ok && result.sessionId) {
+        try { router.setParams({ sessionId: result.sessionId }); } catch (e) { console.warn("Could not set params for session ID during rapid nav", e); }
+      } else {
+        console.error("Failed to create session in background:", result.error);
+        try { router.setParams({ sessionId: 'error' }); } catch (e) { console.warn("Could not set params for error state during rapid nav", e); }
+      }
+    } catch (e) {
+      console.error("Exception in handleStartSession (background):", e);
+      try { router.setParams({ sessionId: 'error' }); } catch (e) { console.warn("Could not set params for error state during rapid nav", e); }
+    }
+  }
 
   return (
     <ImageBackground
@@ -54,7 +97,8 @@ export default function Home() {
 
         {/* Start Session Button - Replace with component */}
         <StartSessionButton
-          onPress={() => router.push('/(main)/session')}
+          onPress={handleStartSession}
+          isLoading={isLoading}
         />
 
 

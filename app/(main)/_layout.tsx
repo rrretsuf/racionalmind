@@ -6,7 +6,7 @@ export default function MainLayout() {
   return (
     <Stack screenOptions={{ headerShown: false, animation: 'none' }}>
       <Stack.Screen name="home" />
-      <Stack.Screen name="session" />
+      <Stack.Screen name="session" initialParams={{ sessionId: undefined }} />
       <Stack.Screen name="history" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="module" />
