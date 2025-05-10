@@ -2,15 +2,14 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 import { corsHeaders } from "../_shared/cors.ts";
 import { logger } from "../_shared/logger.ts";
-
-// Declare Supabase type if not globally available through Deno/Supabase environment
-// This allows using Supabase.ai.Session
-declare const Supabase: any; 
+import {
+    CHAT_MODEL_PAYING,
+    CHAT_MODEL_FREE,
+    DEFAULT_TARGET_MAX_OUTPUT_TOKENS_CHAT
+} from "../_shared/constants.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-const OPENAI_MODEL = "o4-mini-2025-04-16";
 
-// Helper: Custom TransformStream to parse OpenAI SSE and format for client
 class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
   private accumulatedData = "";
   private encoder = new TextEncoder();
@@ -49,12 +48,10 @@ class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
 
             } catch (e) {
               logger.error("Error parsing OpenAI JSON chunk:", e, "Chunk content:", dataContent);
-              // Send an error chunk to the client
               const errorMsg = `data: ${JSON.stringify({ error: "Error processing stream data" })}\n\n`;
               try { controller.enqueue(this.encoder.encode(errorMsg)); } catch (enqueueError) { logger.error("Failed to enqueue parse error:", enqueueError); }
             }
           } else if (line.trim()) {
-             // Log lines that don't start with 'data: ' but are not empty
              logger.warn("Received non-data line from OpenAI:", line);
           }
         }
@@ -65,14 +62,12 @@ class OpenAIStreamParser extends TransformStream<string, Uint8Array> {
 
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     logger.debug("Handling OPTIONS request");
     return new Response('ok', { headers: corsHeaders });
   }
   logger.debug(`Received ${req.method} request`);
 
-  // Initialize Supabase client
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !supabaseServiceRoleKey) {
@@ -84,16 +79,6 @@ serve(async (req: Request) => {
   }
   const supabase: SupabaseClient = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-  // Initialize Embedding Model Session
-  let embeddingModel: any;
-  try {
-    embeddingModel = new Supabase.ai.Session('gte-small');
-  } catch (e) {
-    logger.error("Failed to initialize Supabase.ai.Session for embeddings:", e);
-    // Decide if this is fatal or if we can proceed without embeddings
-    // For now, proceed and embeddings will be null.
-  }
-
   try {
     // --- Authentication & Parameter Validation ---.
     const url = new URL(req.url);
@@ -101,7 +86,6 @@ serve(async (req: Request) => {
     const sessionId = url.searchParams.get("session_id");
     const userMessageText = url.searchParams.get("text");
 
-    // Validate required parameters
      if (!userMessageText || !sessionId || !userId) {
        const missingParams = [
          !userMessageText && "text",
@@ -117,6 +101,26 @@ serve(async (req: Request) => {
      }
      logger.debug(`Processing request: user_id=${userId}, session_id=${sessionId}`);
 
+    // --- Determine User Tier & Select Model ---
+    let selectedOpenAiModel = CHAT_MODEL_FREE;
+    try {
+        const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('tier')
+            .eq('id', userId)
+            .single();
+
+        if (profileError) {
+            logger.warn(`openai-chat: Could not fetch profile for user ${userId}, defaulting to free model. Error: ${profileError.message}`);
+        } else if (profileData && profileData.tier === 'paying') {
+            selectedOpenAiModel = CHAT_MODEL_PAYING;
+            logger.debug(`openai-chat: User ${userId} is on paying tier, using model: ${selectedOpenAiModel}`);
+        } else {
+            logger.debug(`openai-chat: User ${userId} is on free tier or tier undefined, using model: ${selectedOpenAiModel}`);
+        }
+    } catch (e) {
+        logger.error(`openai-chat: Error fetching user profile for tier determination, defaulting to free model:`, e);
+    }
 
     // --- OpenAI Key Check ---
     if (!OPENAI_API_KEY) {
@@ -129,14 +133,24 @@ serve(async (req: Request) => {
 
     // --- Generate User Message Embedding ---
     let userMessageEmbedding = null;
-    if (embeddingModel && userMessageText) {
+    if (userMessageText && userMessageText.trim() !== "") {
       try {
-        logger.debug("Generating embedding for user message...");
-        const embeddingResult = await embeddingModel.run(userMessageText, { mean_pool: true, normalize: true });
-        userMessageEmbedding = embeddingResult; // Assuming result is the embedding itself
-        logger.debug("User message embedding generated.");
-      } catch (embedError) {
-        logger.error('Failed to generate embedding for user message:', embedError);
+        logger.debug("Attempting to generate embedding for user message via generate-embeddings function...");
+        const { data: embedData, error: embedError } = await supabase.functions.invoke(
+          'generate-embeddings',
+          { body: { input: userMessageText } }
+        );
+
+        if (embedError) {
+          logger.error('Error invoking generate-embeddings for user message:', embedError);
+        } else if (embedData && embedData.embedding) {
+          userMessageEmbedding = embedData.embedding;
+          logger.debug("User message embedding generated successfully via function call.");
+        } else {
+          logger.warn('generate-embeddings for user message returned no embedding or unexpected data:', embedData);
+        }
+      } catch (invokeError) {
+        logger.error('Caught error invoking generate-embeddings for user message:', invokeError);
       }
     }
 
@@ -159,26 +173,54 @@ serve(async (req: Request) => {
     } catch (dbError) {
       logger.error('Unexpected error saving user message:', dbError);
     }
+    logger.debug("Skipping history/RAG lookup for now.");
 
-    // --- TODO: Implement Chat History & RAG Context Retrieval ---
-    // Fetch history/context based on userId and sessionId BEFORE constructing messages
-    // const messagesToOpenAI = await constructMessagesWithHistory(userId, sessionId, userMessageText);
-    logger.debug("Skipping history/RAG lookup for now."); // Placeholder log
+    // ---Call truncate-history function---
+    let truncatedHistoricalMessages: Array<{ role: string; content: string | null }> = [];
+    const systemPromptContent = "You are a helpful AI assistant. Your name is Rational Mind. You are designed to help users explore and manage thoughts that lead to overthinking, and promote self-understanding and mental clarity. You should be supportive and act as an \"Overthinking Buddy\".";
+    
+    try {
+      logger.info("openai-chat: Invoking 'truncate-history' function...");
+      const { data: truncationResult, error: truncationError } = await supabase.functions.invoke(
+        'truncate-history',
+        {
+          body: {
+            sessionId: sessionId,
+            systemPromptText: systemPromptContent,
+            currentUserMessageText: userMessageText,
+            openAiModelName: selectedOpenAiModel,
+            targetMaxOutputTokens: DEFAULT_TARGET_MAX_OUTPUT_TOKENS_CHAT, 
+          }
+        }
+      );
+
+      if (truncationError) {
+        logger.error("openai-chat: Error invoking 'truncate-history' function:", truncationError);
+      } else if (truncationResult && truncationResult.truncatedHistoricalMessages) {
+        truncatedHistoricalMessages = truncationResult.truncatedHistoricalMessages;
+        logger.info("openai-chat: Successfully received truncated history.", { debugInfo: truncationResult.debugInfo });
+      } else {
+        logger.warn("openai-chat: 'truncate-history' function returned no messages or unexpected data.", { response: truncationResult });
+      }
+    } catch (invokeError) {
+      logger.error("openai-chat: Caught an exception while invoking 'truncate-history':", invokeError);
+    }
 
     // --- Construct OpenAI Request ---
-    const messages = [
+    const messagesToOpenAI = [
       {
         role: "system",
-        content: "You are a helpful AI assistant. Your name is Rational Mind. You are designed to help users explore and manage thoughts that lead to overthinking, and promote self-understanding and mental clarity. You should be supportive and act as an \"Overthinking Buddy\".",
+        content: systemPromptContent,
       },
-      { role: "user", content: userMessageText },
+      ...truncatedHistoricalMessages,
+      { role: "user", content: userMessageText }, 
     ];
 
     const openaiPayload = {
-      model: OPENAI_MODEL,
-      messages: messages,
+      model: selectedOpenAiModel,
+      messages: messagesToOpenAI,
       stream: true,
-      max_completion_tokens: 300,
+      max_completion_tokens: DEFAULT_TARGET_MAX_OUTPUT_TOKENS_CHAT,
     };
     logger.debug("Sending payload to OpenAI:", JSON.stringify(openaiPayload, null, 2));
 
@@ -232,14 +274,24 @@ serve(async (req: Request) => {
           const aiMessageText = openAIStreamParserInstance.accumulatedResponseForDb;
           let aiMessageEmbedding = null;
 
-          if (embeddingModel && aiMessageText && aiMessageText.trim() !== "") {
+          if (aiMessageText && aiMessageText.trim() !== "") {
             try {
-              logger.debug("Generating embedding for AI message...");
-              const embeddingResult = await embeddingModel.run(aiMessageText, { mean_pool: true, normalize: true });
-              aiMessageEmbedding = embeddingResult;
-              logger.debug("AI message embedding generated.");
-            } catch (embedError) {
-              logger.error('Failed to generate embedding for AI message:', embedError);
+              logger.debug("Attempting to generate embedding for AI message via generate-embeddings function...");
+              const { data: embedData, error: embedError } = await supabase.functions.invoke(
+                'generate-embeddings',
+                { body: { input: aiMessageText } }
+              );
+
+              if (embedError) {
+                logger.error('Error invoking generate-embeddings for AI message:', embedError);
+              } else if (embedData && embedData.embedding) {
+                aiMessageEmbedding = embedData.embedding;
+                logger.debug("AI message embedding generated successfully via function call.");
+              } else {
+                logger.warn('generate-embeddings for AI message returned no embedding or unexpected data:', embedData);
+              }
+            } catch (invokeError) {
+              logger.error('Caught error invoking generate-embeddings for AI message:', invokeError);
             }
           }
           

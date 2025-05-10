@@ -35,18 +35,37 @@ serve(async (req: Request) => {
       .limit(1)
       .maybeSingle()
 
+    if (prevSessionError) {
+      logger.error('Error fetching previous session', prevSessionError)
+    }
+
     let newNum = 1
     if (prevSession) {
       newNum = prevSession.num + 1
       const { error: updateError } = await supabase
         .from('sessions')
-        .update({ status: 'completed', ended_at: new Date().toISOString() })
+        .update({ status: 'completed', updated_at: new Date().toISOString() })
         .eq('id', prevSession.id)
+
       if (updateError) {
         logger.error('Failed to update previous session', updateError)
-        return new Response(JSON.stringify({ error: 'Failed to update previous session' }), { status: 500, headers: corsHeaders })
+      } else {
+        logger.info(`Previous session ${prevSession.id} marked as completed. Triggering post-processing.`)
+        supabase.functions.invoke('process-session-end', {
+          body: { session_id: prevSession.id, user_id: userId },
+        }).then(({ data, error }) => {
+          if (error) {
+            logger.error('Error invoking process-session-end:', error)
+          } else {
+            logger.info('process-session-end invoked successfully:', data)
+          }
+        }).catch(invokeError => {
+          logger.error('Caught error during supabase.functions.invoke for process-session-end:', invokeError)
+        })
       }
-    } else {
+    }
+
+    if (!prevSession) {
       const { data: maxNumRow, error: maxNumError } = await supabase
         .from('sessions')
         .select('num')
@@ -54,30 +73,46 @@ serve(async (req: Request) => {
         .order('num', { ascending: false })
         .limit(1)
         .maybeSingle()
+
+      if (maxNumError) {
+        logger.error('Error fetching max session number', maxNumError)
+      }
+
       if (maxNumRow && maxNumRow.num) {
         newNum = maxNumRow.num + 1
+      } else {
+        newNum = 1
       }
+    } else if (prevSession && prevSession.num) {
+      newNum = prevSession.num + 1
     }
+
+    const newSessionPayload = {
+      user_id: userId,
+      num: newNum,
+      status: 'active',
+      started_at: new Date().toISOString(),
+      updated_at: null,
+      summary: null,
+      summary_embedding: null,
+      patterns: null,
+      patterns_embedding: null
+    }
+
+    logger.debug("Attempting to insert new session with payload:", newSessionPayload)
 
     const { data: newSession, error: insertError } = await supabase
       .from('sessions')
-      .insert({
-        user_id: userId,
-        num: newNum,
-        status: 'active',
-        started_at: new Date().toISOString(),
-        ended_at: null,
-        summary: null,
-        summary_embedding: null,
-        patterns: null,
-        patterns_embedding: null
-      })
+      .insert(newSessionPayload)
       .select('id')
       .single()
+
     if (insertError) {
       logger.error('Failed to create new session', insertError)
       return new Response(JSON.stringify({ error: 'Failed to create new session' }), { status: 500, headers: corsHeaders })
     }
+
+    logger.info(`New session ${newSession.id} created for user ${userId}`)
     return new Response(JSON.stringify({ sessionId: newSession.id }), { status: 200, headers: corsHeaders })
   } catch (error) {
     logger.error('Unhandled error in create-session', error)
