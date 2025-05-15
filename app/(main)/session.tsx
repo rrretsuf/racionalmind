@@ -21,6 +21,7 @@ export default function SessionScreen() {
   const router = useRouter();
   const { sessionId: initialSessionId } = useLocalSearchParams<{ sessionId?: string }>();
   const [currentSessionId, setCurrentSessionId] = useState(initialSessionId);
+  const [rationality, setRationality] = useState<number>(3); // Default rationality
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -44,6 +45,47 @@ export default function SessionScreen() {
       setIsSessionEstablishing(false);
       setSessionError(null);
       logger.info(`Session active with ID: ${currentSessionId}`);
+
+      const fetchUserProfileRationality = async () => {
+        try {
+          const { data: { user }, error: userError } = await supabase.auth.getUser();
+          if (userError || !user) {
+            logger.warn(
+              'SessionScreen: Could not get user for fetching rationality, using default.',
+              userError ? { error: userError.message } : undefined
+            );
+            // Rationality state already defaults to 3, so no need to set it here
+            return;
+          }
+
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('rationality')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) {
+            logger.warn(
+              `SessionScreen: Failed to fetch profile rationality for user ${user.id}, using default.`,
+              profileError ? { error: profileError.message } : undefined
+            );
+          } else if (profileData && typeof profileData.rationality === 'number' && profileData.rationality >= 1 && profileData.rationality <= 5) {
+            logger.info(`SessionScreen: Setting rationality to ${profileData.rationality} from user profile.`);
+            setRationality(profileData.rationality);
+          } else {
+            logger.info(`SessionScreen: User profile rationality not set or invalid, using default (3). Profile data:`, profileData);
+            // Rationality state already defaults to 3
+          }
+        } catch (e) {
+          logger.error(
+            'SessionScreen: Unexpected error fetching user profile rationality, using default.',
+            e instanceof Error ? { error: e.message, stack: e.stack } : { error: String(e) }
+          );
+        }
+      };
+
+      fetchUserProfileRationality();
+
     } else if (currentSessionId === 'pending') {
       setIsSessionEstablishing(true);
       setSessionError(null);
@@ -226,31 +268,34 @@ export default function SessionScreen() {
         setIsLoading(false);
         return;
       }
-      const accessToken = authSession.access_token;
       const userId = authSession.user.id;
+      const accessToken = authSession.access_token;
+
       const queryParams = new URLSearchParams({
-        session_id: String(currentSessionId),
+        session_id: currentSessionId,
         user_id: userId,
         text: userMessageContent,
+        rationality: String(rationality),
       });
-      const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-      if (!anonKey) {
-          logger.error("FATAL: EXPO_PUBLIC_SUPABASE_ANON_KEY is not defined in environment variables.");
-           const errorId = Date.now().toString() + '-error-env';
-           setMessages(prev => prev.map(m => m.id === newAiId ? { ...m, content: `Client Configuration Error: Anon key missing.`} : m));
-          setIsLoading(false);
-          return;
+
+      const baseFunctionsUrl = process.env.EXPO_PUBLIC_SUPABASE_FUNCTIONS_URL || (process.env.EXPO_PUBLIC_SUPABASE_URL ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1` : undefined);
+      if (!baseFunctionsUrl) {
+        logger.error("FATAL: Neither EXPO_PUBLIC_SUPABASE_FUNCTIONS_URL nor EXPO_PUBLIC_SUPABASE_URL is defined.");
+        setMessages(prev => prev.map(m => m.id === newAiId ? { ...m, content: `Client Configuration Error: Supabase Functions URL missing.`} : m));
+        setIsLoading(false);
+        return;
       }
-      const functionUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/openai-chat?${queryParams.toString()}`;
-      logger.info(`Connecting to EventSource: ${functionUrl}`);
+
+      const sseUrl = `${baseFunctionsUrl}/openai-chat?${queryParams.toString()}`;
+      logger.info(`Connecting to EventSource: ${sseUrl}`);
       if (eventSourceRef.current) {
           logger.warn("Closing existing EventSource before creating new one.");
           closeEventSource();
       }
-      eventSourceRef.current = new EventSource(functionUrl, {
+      eventSourceRef.current = new EventSource(sseUrl, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
-          'apikey': anonKey,
+          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
         },
          withCredentials: false
       });

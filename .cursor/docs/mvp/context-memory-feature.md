@@ -12,7 +12,7 @@ Read it top-to-bottom; every requirement is explicit and cross-referenced with e
   – Static / Dynamic component split. Caching handled by client/edge-function logic (see Section 4).
   – New semantic entities: Patterns and People.
   – Domain knowledge switches from sports-psychology to overthinking-management.
-  – **AI Models:** Uses **`o4-mini`** for paying users and **`40 mini`** for free/no-account users.
+  – **AI Models:** Uses **`o4-mini`** for paying users and **`4o-mini`** for free users. (Two tiers: Free and Paying)
 
 ----------------------------------------------------------------------------------------------------
 2. DATA ENTITIES & DB MAPPING
@@ -25,8 +25,8 @@ Read it top-to-bottom; every requirement is explicit and cross-referenced with e
     * *Supabase Source:* `ai_knowledge.system_prompt`
     * *Notes:* The chosen avatar determines which prompt is used (1:1 mapping). Included in the `messages` array sent to OpenAI. Potentially benefits from OpenAI Static Prompt Caching.
 * **Static User Profile:**
-    * *Supabase Source:* All non-dynamic fields in the `profiles` table (e.g., onboarding answers).
-    * *Notes:* Immutable data collected during onboarding. Included in context for relevant turns. Potentially benefits from OpenAI Static Prompt Caching if consistently prepended.
+    * *Supabase Source:* Specific fields from the `profiles` table: `name`, `age_group`, `main_topic`, `goal`. (Onboarding answers that populate these fields).
+    * *Notes:* Data collected during onboarding, treated as static. Included in context for relevant turns. Potentially benefits from OpenAI Static Prompt Caching if consistently prepended.
 * **Dynamic User Profile:**
     * *Supabase Source:* `profiles.dynamic_profile`
     * *Notes:* Updated after each session, but treated as static *within* a given session for consistency. Included in context for relevant turns. Less likely to benefit from static caching due to updates.
@@ -48,13 +48,13 @@ Read it top-to-bottom; every requirement is explicit and cross-referenced with e
     * *Extra Notes:* These are bullet-list patterns extracted from each session.
 * **People:**
     * *Supabase Source:* `people.description`
-    * *Embedding Column:* `*people.name_embedding*` (NEW - Embed the name for lookup)
+    * *Embedding Column:* `people.name_embedding`
     * *Retrieval Key:* Primarily **exact name match** (case-insensitive) against tokens in the user message. If ambiguous or no exact match, fall back to nearest-neighbor search using the name embedding.
     * *Extra Notes:* See section §5.b for the detailed disambiguation strategy.
 * **AI Knowledge (Overthinking Domain):**
     * *Supabase Source:* `ai_knowledge.knowledge_text`
     * *Embedding Column:* `ai_knowledge.knowledge_embedding`
-    * *Retrieval Key:* Similarity search based on user message embedding, filtered by the selected `avatar_name`.
+    * *Retrieval Key:* Similarity search based on user message embedding, filtered by the user's `effectiveRationality` level (ID 1-5).
     * *Extra Notes:* Contains information and techniques related to managing overthinking.
 
 **C. LIVE COMPONENTS (always part of the immediate context)**
@@ -74,14 +74,14 @@ Legend: EF = Edge Function
     * EF inserts new row in `sessions` (status=ACTIVE), returns `session_id`.
 
 2.  **User Message**
-    * Client → EF `openai_chat` payload: `{session_id, user_id, text, avatar_name}`.
-    * `openai_chat` determines the user tier (No Account, Free, Paying) based on `user_id`.
-    * `openai_chat` selects the **appropriate OpenAI model (`o4-mini` or `40 mini`)** based on the tier.
+    * Client → EF `openai_chat` payload: `{session_id, user_id, text, rationality}`. (Rationality ID 1-5)
+    * `openai_chat` determines the user tier (Free, Paying) based on `user_id`.
+    * `openai_chat` selects the **appropriate OpenAI model (`o4-mini` or `40-mini`)** based on the tier.
     * `openai_chat` retrieves chat history for `session_id` from `messages` table.
     * `openai_chat` retrieves Static context components (A) for the user.
-    * `openai_chat` performs RAG search (if tier allows):
+    * `openai_chat` performs RAG search:
         * Generates embedding for user message (`text`).
-        * Calls RAG search functions for Dynamic components (B).
+        * Calls RAG search functions for Dynamic components (B), filtering AI Knowledge by `effectiveRationality`.
     * `openai_chat` constructs the `messages` array for OpenAI:
         * Includes System Prompt.
         * Includes relevant retrieved Static and Dynamic (RAG) context woven into the history or as part of a contextual preamble.
@@ -92,7 +92,7 @@ Legend: EF = Edge Function
 
 3.  **Process Session End (async EF `process_session_end`)**
     A.  Determine user tier (Free or Paying).
-    B.  Select the appropriate OpenAI model (`o4-mini` for Paying, `40 mini` for Free).
+    B.  Select the appropriate OpenAI model (`o4-mini` for Paying, `40-mini` for Free).
     C.  Fetch full chat history for the session.
     D.  Call OpenAI to generate summary → `sessions.summary`, plus embedding.
     E.  Call OpenAI to extract patterns → `sessions.patterns`, plus embedding.
@@ -104,11 +104,10 @@ Legend: EF = Edge Function
 4. MODEL & CACHING STRATEGY
 ----------------------------------------------------------------------------------------------------
 * **Model Selection:** Done within the `openai-chat` Edge Function based on user tier look-up.
-    * Tier 0 (No Account): `40 mini` for chat.
-    * Tier 1 (Free): `40 mini` for chat and background processing.
+    * Tier 1 (Free): `40-mini` for chat and background processing.
     * Tier 2 (Paying): `o4-mini` for chat and background processing.
 * **Caching:**
-    * **OpenAI Static Prompt Caching:** OpenAI offers caching for the *static prefix* of a prompt (like system message + initial user context) on some models (e.g., `gpt-4-turbo-preview`, `gpt-4-0125-preview`, `gpt-3.5-turbo-0125`). If the exact same prefix tokens are sent repeatedly, OpenAI *may* reuse cached results, potentially reducing token costs for that prefix. The `prompt_filter_results` in the response indicates if caching was applied. **This is NOT a stateful conversational cache like Gemini's `CachedContent`.** It only optimizes repeated static prefixes.
+    * **OpenAI Static Prompt Caching:** OpenAI offers caching for the *static prefix* of a prompt. Initial explorations suggest that due to the dynamic nature of several context components (like `dynamic_profile` and `main_pattern` if included in the static block), achieving significant benefits from this type of caching is challenging for the core conversational flow. Further optimization might be possible for very stable prefixes.
     * **Application-Level Caching:**
         * **Chat History:** Must be explicitly fetched from the `messages` table by the `openai-chat` function and included in the `messages` array sent to OpenAI on each turn. **Implementing effective history truncation is critical.**
         * **Static/Dynamic Context:** Must be fetched (DB lookups, RAG searches) by the `openai-chat` function on each relevant turn and included in the `messages` array. There's no built-in OpenAI mechanism to cache this across turns. Short-term caching within the Edge Function instance *might* be possible but unreliable across invocations.
@@ -125,29 +124,27 @@ a) **Embeddings**
 b) **People Disambiguation**
     * Problem: duplicate names ("John").
     * Solution (MVP):
-        1.  Primary key for lookup = (`user_id`, `lower(name)`).
-        2.  RAG retrieval: first try **exact case-insensitive match** of tokens in user message against the `people.name` column. If one unique match, retrieve description. If zero/multiple matches, fallback to nearest-vector search on `people.name_embedding`.
+        1.  Primary lookup method: exact case-insensitive match of tokens in user message against the people.name column.
+        2.  RAG retrieval: Attempt an exact case-insensitive match of tokens from the user message against the existing `people.name` column. If a unique match is found, retrieve its description. If no unique match is found by this method, proceed to a nearest-vector search using the `people.name_embedding`.
         3.  Alias management deferred post-MVP.
 
 c) **Dynamic Retrieval Pipeline per turn (Conceptual - inside `openai-chat`)**
 ```typescript
 // Fetch user tier
-const userTier = await getUserTier(userId);
-const canUseRAG = userTier === 'Free' || userTier === 'Paying';
+const userTier = await getUserTier(userId); // Returns 'Free' or 'Paying'
 
 // Fetch chat history (and truncate appropriately)
 const chatHistory = await getTruncatedChatHistory(sessionId);
 
 // Fetch static context
-const staticContext = await getStaticContext(userId, avatarName);
+const staticContext = await getStaticContext(userId, effectiveRationality); // Rationality ID 1-5
 
 let dynamicContextResults = [];
-if (canUseRAG) {
-    const userMessageEmbedding = await generateEmbedding(userMessage);
-    // Fetch Summaries, Patterns, People, Knowledge...
-    // ... (RAG calls using embedding) ...
-    dynamicContextResults = await performRAGSearch(userMessageEmbedding, userId, avatarName, userMessage);
-}
+// Generate embedding for user message
+const userMessageEmbedding = await generateEmbedding(userMessage);
+// Fetch Summaries, Patterns, People, Knowledge...
+// ... (RAG calls using embedding, AI Knowledge filtered by effectiveRationality) ...
+dynamicContextResults = await performRAGSearch(userMessageEmbedding, userId, effectiveRationality, userMessage);
 
 // Construct the 'messages' array for OpenAI
 const messagesForOpenAI = constructMessagesForOpenAI(
@@ -169,9 +166,9 @@ const model = selectOpenAIModel(userTier);
 ----------------------------------------------------------------------------------------------------
 6. EDGE FUNCTIONS RESPONSIBILITIES
 ----------------------------------------------------------------------------------------------------
-* `openai-chat`: Handles the main chat loop, user tier detection, model selection, context assembly (history, static, RAG), **history truncation**, interaction with **OpenAI API** (streaming), SSE streaming, message persistence.
+* `openai-chat`: Handles the main chat loop, user tier detection, model selection, context assembly (history, static, RAG using `effectiveRationality` for AI Knowledge), **history truncation**, interaction with **OpenAI API** (streaming), SSE streaming, message persistence.
 * `create-session`: Manages atomic start/end of sessions, triggers background processing.
-* `process-session-end`: Runs asynchronously post-session. Selects model based on tier (`o4-mini`/`40 mini`). Generates summaries, extracts patterns, updates profiles, manages people entries using the appropriate OpenAI model.
+* `process-session-end`: Runs asynchronously post-session. Selects model based on tier (`o4-mini`/`40-mini`). Generates summaries, extracts patterns, updates profiles, manages people entries using the appropriate OpenAI model.
 * `generate-embeddings`: Shared utility function using Supabase AI.
 * `rag-search`: Set of shared utility functions for pgvector queries.
 
@@ -186,9 +183,9 @@ const model = selectOpenAIModel(userTier);
 8. DECISIONS SUMMARY (Reflecting OpenAI Switch)
 ----------------------------------------------------------------------------------------------------
 * **AI API:** Switched to **OpenAI API**.
-* **Models:** Using **`o4-mini`** and **`40 mini`** based on user tier.
-* **Caching:** Primarily application-managed. **Chat history must be fetched and truncated by the Edge Function**. OpenAI's *Static Prompt Caching* might provide minor optimization for the static prompt prefix if applicable models are used, but doesn't replace the need for manual history/context management.
-* **RAG Thresholds:** Default to **`k = 3`** and **`θ = 0.75`**. Configurable.
+* **Models:** Using **`o4-mini`** (Paying) and **`40-mini`** (Free) based on user tier.
+* **Caching:** Primarily application-managed. **Chat history must be fetched and truncated by the Edge Function**. OpenAI's *Static Prompt Caching* was explored but found to offer limited benefits for the dynamic portions of the conversational context.
+* **RAG Thresholds:** Default to **`k = 3`** (sessions, knowledge), **`k = 2`** (people) and **`θ = 0.75`**. Configurable.
 * **People Name Aliases:** **Defer** post-MVP. Use exact match + vector fallback.
 * **Data Pruning:** **Defer** post-MVP.
 

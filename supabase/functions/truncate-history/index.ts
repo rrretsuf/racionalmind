@@ -73,11 +73,18 @@ serve(async (req: Request) => {
     const systemPromptTokens = tokenizer.encode(systemPromptText).bpe.length + MESSAGE_OVERHEAD_TOKENS;
     const currentUserMessageTokens = tokenizer.encode(currentUserMessageText).bpe.length + MESSAGE_OVERHEAD_TOKENS;
 
+    const effectiveRagContextBudgetTokens = Math.min(ragContextBudgetTokens, 800);
+    if (ragContextBudgetTokens > 800) {
+      logger.warn(`truncate-history: Original ragContextBudgetTokens (${ragContextBudgetTokens}) exceeded 800, capped to ${effectiveRagContextBudgetTokens}.`);
+    }
+
     const calculatedInputTokenBudget = modelMaxContext - targetMaxOutputTokens - safetyBufferTokens;
-    const historyTokenBudget = calculatedInputTokenBudget - systemPromptTokens - currentUserMessageTokens - ragContextBudgetTokens;
+    const historyTokenBudget = calculatedInputTokenBudget - systemPromptTokens - currentUserMessageTokens - effectiveRagContextBudgetTokens;
 
     logger.debug("truncate-history: Token budget calculations:", {
-      modelMaxContext, targetMaxOutputTokens, safetyBufferTokens, ragContextBudgetTokens,
+      modelMaxContext, targetMaxOutputTokens, safetyBufferTokens,
+      ragContextBudgetTokensOriginal: ragContextBudgetTokens,
+      effectiveRagContextBudgetTokens,
       systemPromptTokens, currentUserMessageTokens,
       calculatedInputTokenBudget, historyTokenBudget
     });
@@ -146,6 +153,8 @@ serve(async (req: Request) => {
       originalMessageCount,
       truncatedMessageCount,
       tokensUsedByHistory: currentHistoryTokensUsed,
+      ragContextBudgetTokensOriginal: ragContextBudgetTokens,
+      effectiveRagContextBudgetTokens,
     };
 
     return new Response(JSON.stringify({ truncatedHistoricalMessages, debugInfo }), {

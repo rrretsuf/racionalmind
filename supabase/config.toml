@@ -1,11 +1,29 @@
-[functions.gemini-chat]
+[functions.process-session-end]
 enabled = true
-# TODO: REVERT FOR PRODUCTION! Temporarily disabled JWT verification for testing.
-verify_jwt = false
-import_map = "./functions/gemini-chat/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
-entrypoint = "./functions/gemini-chat/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/gemini-chat/*.html" ]
+verify_jwt = true
+entrypoint = "./functions/process-session-end/index.ts"
+
+[functions.truncate-history]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/truncate-history/index.ts"
+
+[functions.rag-dynamic-context]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/rag-dynamic-context/index.ts"
+
+[functions.openai-chat]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/openai-chat/index.ts"
+
+[functions.create-session]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/create-session/index.ts"
+
+[functions.generate-embeddings]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/generate-embeddings/index.ts"

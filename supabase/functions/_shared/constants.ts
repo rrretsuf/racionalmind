@@ -15,3 +15,7 @@ export const DEFAULT_RAG_CONTEXT_BUDGET_TOKENS = 0;
 export const DEFAULT_SAFETY_BUFFER_TOKENS = 250;
 
 export const PROCESSING_MAX_TOKENS = 1024;
+
+export const RAG_SESSIONS_LIMIT = 3;
+export const RAG_PEOPLE_LIMIT = 2;
+export const RAG_KNOWLEDGE_LIMIT = 2;

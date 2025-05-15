@@ -22,7 +22,7 @@
 **Rational Mind**
 
 ### 1.2. Namen Aplikacije (MVP)
-MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem mladi med 16. in 24. letom, ki se soočajo z overthinkanjem) komunicirajo s personaliziranim **AI Racionalnim Prijateljem**[cite: 8]. AI, ki ga poganjajo **OpenAI modeli (`o4-mini` in `40 mini`)** [cite: 13, 15] in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati in obvladovati misli, ki vodijo v overthinkanje, ter spodbuja samorazumevanje in razvoj strategij za mentalno jasnost[cite: 8]. AI se uči o uporabniku, prepoznava vzorce in prilagaja svoje odgovore, deluje kot vedno dostopen (24/7) prijatelj. Uporabniki lahko izbirajo med 3-5 AI avatarji z različnimi osebnostmi (definiranimi s sistemskimi promti). MVP služi kot temelj za prihodnje razširitve in uvedbo premium funkcij.
+MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, kjer lahko uporabniki (predvsem mladi med 16. in 24. letom, ki se soočajo z overthinkanjem) komunicirajo s personaliziranim **AI Racionalnim Prijateljem**. AI, ki ga poganjajo **OpenAI modeli (`o4-mini` in `40-mini`)** in napreden sistem spomina/konteksta, uporabnikom pomaga raziskovati in obvladovati misli, ki vodijo v overthinkanje, ter spodbuja samorazumevanje in razvoj strategij za mentalno jasnost. AI se uči o uporabniku, prepoznava vzorce in prilagaja svoje odgovore, deluje kot vedno dostopen (24/7) prijatelj. Uporabniki izbirajo svojo stopnjo racionalnosti (1-5), ki vpliva na odzive AI. MVP služi kot temelj za prihodnje razširitve in uvedbo premium funkcij.
 
 ### 1.3. Ciljna Publika (MVP)
 * Mladi odrasli (16-24 let), ki se pogosto znajdejo v zankah overthinkanja.
@@ -42,14 +42,13 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
     * Konverzija v premium tier (dolgoročno).
 
 ### 1.5. Edinstvene Prodajne Točke (Unique Selling Points - MVP)
-* **Specializiran AI Racionalni Prijatelj:** Namenski AI asistent, zasnovan za pomoč pri prepoznavanju in obvladovanju overthinkanja.
-* **Napreden Spomin in Kontekst:** AI ohranja kontinuiteto, prepoznava vzorce in uporablja globok kontekst (profili, pretekle seanse, prepoznani vzorci, RAG) za visoko personalizirane in prilagodljive interakcije.
-* **Izbira Avatarjev:** Možnost izbire med AI osebnostmi za bolj prilagojeno izkušnjo.
+* **Specializiran AI Racionalni Prijatelj:** Namenski AI asistent, zasnovan za pomoč pri prepoznavanju in obvladovanju overthinkanja, prilagodljiv glede na izbrano stopnjo racionalnosti (1-5).
+* **Napreden Spomin in Kontekst:** AI ohranja kontinuiteto, prepoznava vzorce in uporablja globok kontekst (specifični statični profil, pretekle seanse, prepoznani vzorci, RAG na podlagi racionalnosti) za visoko personalizirane in prilagodljive interakcije.
 * **Glasovna Interakcija:** Podpora za vnos govora (STT) in opcijski izhod govora (TTS) za lažjo uporabo.
 * **Zasebnost in Varnost:** Poudarek na varnem okolju za raziskovanje misli.
 * **Dostopnost:** Vedno na voljo (24/7) podpora v žepu.
-* **Informativni Viri:** Integrirani moduli s praktičnimi metodami za obvladovanje overthinkanja, ki jih AI lahko uporabi v seansah.
-* **Trije Nivoji:** **Uporabnik brez računa (No Account)**[cite: 21], **Brezplačen račun (Free)**[cite: 21], in **Plačljiv račun (Paying)** [cite: 21] z različnimi omejitvami/funkcijami in uporabljenimi AI modeli[cite: 19, 20].
+* **Informativni Viri:** Integrirani moduli s praktičnimi metodami za obvladovanje overthinkanja, ki jih AI lahko uporabi v seansah (RAG na podlagi racionalnosti).
+* **Dva Nivoja:** **Brezplačen račun (Free)** in **Plačljiv račun (Paying)** z različnimi omejitvami/funkcijami in uporabljenimi AI modeli.
 
 ---
 
@@ -57,9 +56,9 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 
 *(Podrobnejši opis je v dokumentu `App Flow Document (MVP v1.0.0)`)*
 
-* **Onboarding in Prijava/Registracija:** Uporabnik se lahko prijavi/registrira preko Apple ID ali Email/Gesla. Novi uporabniki gredo skozi kratek onboarding tok, kjer odgovorijo na nekaj vprašanj za izgradnjo statičnega profila in **izberejo svojega AI avatarja**.
-* **Glavni Zaslon:** Po prijavi uporabnik vidi pozdrav, gumb za začetek nove seanse ter ikone za zgodovino in profil. Na dnu je drsljiva vrsta z informativnimi moduli o metodah proti overthinkanju. Prikazan je tudi izbrani AI avatar.
-* **Tok Seanse:** Uporabnik začne novo seanso z izbranim AI Racionalnim Prijateljem. Uporablja lahko **tekstovni vnos ali glasovni vnos (STT)**. AI odgovarja na podlagi sporočil in bogatega konteksta (Memory/Context system). Uporabnik lahko **opcijsko posluša AI odgovor (TTS)** s klikom na ikono. Seansa se lahko zaključi ročno, samodejno po neaktivnosti ali ob začetku nove.
+* **Onboarding in Prijava/Registracija:** Uporabnik se lahko prijavi/registrira preko Apple ID ali Email/Gesla. Novi uporabniki gredo skozi kratek onboarding tok, kjer odgovorijo na nekaj vprašanj za izgradnjo statičnega profila in **izberejo svojo začetno stopnjo racionalnosti (1-5)**.
+* **Glavni Zaslon:** Po prijavi uporabnik vidi pozdrav, gumb za začetek nove seanse ter ikone za zgodovino in profil. Na dnu je drsljiva vrsta z informativnimi moduli o metodah proti overthinkanju. Prikazana je tudi izbrana stopnja racionalnosti.
+* **Tok Seanse:** Uporabnik začne novo seanso z AI Racionalnim Prijateljem, ki deluje na podlagi izbrane stopnje racionalnosti. Uporablja lahko **tekstovni vnos ali glasovni vnos (STT)**. AI odgovarja na podlagi sporočil in bogatega konteksta (Memory/Context system). Uporabnik lahko **opcijsko posluša AI odgovor (TTS)** s klikom na ikono. Seansa se lahko zaključi ročno, samodejno po neaktivnosti ali ob začetku nove. Uporabnik lahko med seanso prilagaja stopnjo racionalnosti.
 * **Tok Modulov:** Uporabnik lahko brska med moduli na glavnem zaslonu in si ogleda njihovo vsebino (samo za branje). Moduli vsebujejo metode/tehnike, ki jih AI lahko uporabi med seanso (RAG).
 * **Tok Zgodovine:** Uporabnik lahko dostopa do seznama preteklih seans, si ogleda njihov AI-generiran povzetek in zgodovino sporočil (samo za branje zaključenih seans).
 * **Tok Profila in Nastavitev:** Uporabnik lahko ureja svoj statični profil, si ogleduje AI-generiran dinamični profil ter **seznam glavnih vzorcev**, ki jih je AI prepoznal v njunih pogovorih. Dostopa do nastavitev (npr. brisanje računa, pravna besedila, morda menjava avatarja) in se odjavi.
@@ -69,18 +68,17 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 ## 3. Ključne Funkcionalnosti (Core Features - MVP)
 
 ### 3.1. AI Klepetalne Seanse (z Racionalnim Prijateljem)
-* **Opis:** Osrednja funkcionalnost aplikacije. Interaktivne klepetalne seanse med uporabnikom in izbranim AI avatarjem (Racionalnim Prijateljem).
+* **Opis:** Osrednja funkcionalnost aplikacije. Interaktivne klepetalne seanse med uporabnikom in AI Racionalnim Prijateljem, katerega odzivnost je odvisna od izbrane stopnje racionalnosti (1-5).
 * **Funkcionalnost:**
     * Standardni klepetalni vmesnik.
     * **Vnos:** Tekstovni ali glasovni (Speech-to-Text - STT).
     * **Izhod:** Tekstovni odgovori AI, ki se pretakajo (stream) v realnem času (SSE). **Opcijski glasovni izhod (Text-to-Speech - TTS)** odgovora ob kliku na ikono.
-    * AI odgovori so generirani s strani **OpenAI modelov (`o4-mini` ali `40 mini`, odvisno od nivoja uporabnika)**[cite: 13, 15], usmerjeni s podrobnim sistemskim promptom, specifičnim za izbranega avatarja in osredotočenim na racionalno analizo in boj proti overthinkanju.
-    * **Integracija s Sistemom Spomina/Konteksta:** AI uporablja statični/dinamični profil, povzetek prejšnje seanse, prepoznane vzorce (RAG), bazo znanja o metodah proti overthinkanju (RAG) za zagotavljanje kontekstualnih in personaliziranih odgovorov.
-    * Zaključek seanse sproži procesiranje v ozadju (generiranje povzetka, identifikacija in shranjevanje novih vzorcev, posodobitev din. profila) z uporabo **ustreznega modela glede na nivo uporabnika (`o4-mini` za plačljive, `40 mini` za brezplačne)**[cite: 13, 15].
-    * **Izbira Avatarja:** Uporabnik izbere enega od 3-5 AI avatarjev z unikatnimi sistemskimi promti (osebnostmi).
-* **Tier Omejitve**[cite: 20, 21]:
-    * **No Account (Tier 0):** Omejeno na 5 sporočil na dan. Uporablja **`40 mini`** za klepet. Kontekst/spomin funkcija (background processing, RAG) je onemogočena.
-    * **Free Account (Tier 1):** Omejeno na 10 sporočil na dan. Uporablja **`40 mini`** za klepet in **`40 mini`** za procesiranje v ozadju (kontekst/spomin, RAG).
+    * AI odgovori so generirani s strani **OpenAI modelov (`o4-mini` ali `40-mini`, odvisno od nivoja uporabnika)**, usmerjeni s podrobnim sistemskim promptom, specifičnim za izbrano stopnjo racionalnosti in osredotočenim na racionalno analizo in boj proti overthinkanju.
+    * **Integracija s Sistemom Spomina/Konteksta:** AI uporablja specifični statični profil (ime, starostna skupina, glavna tema, cilj), dinamični profil, povzetek prejšnje seanse, prepoznane vzorce (RAG), bazo znanja o metodah proti overthinkanju (RAG, filtrirano po racionalnosti) za zagotavljanje kontekstualnih in personaliziranih odgovorov.
+    * Zaključek seanse sproži procesiranje v ozadju (generiranje povzetka, identifikacija in shranjevanje novih vzorcev, posodobitev din. profila) z uporabo **ustreznega modela glede na nivo uporabnika (`o4-mini` za plačljive, `40-mini` za brezplačne)**.
+    * **Izbira Stopnje Racionalnosti:** Uporabnik izbere stopnjo racionalnosti (1-5), ki vpliva na sistemski prompt in filtriranje RAG baze znanja.
+* **Tier Omejitve**:
+    * **Free Account (Tier 1):** Omejeno na 10 sporočil na dan. Uporablja **`40-mini`** za klepet in **`40-mini`** za procesiranje v ozadju (kontekst/spomin, RAG).
     * **Paying Account (Tier 2):** Neomejeno število sporočil. Uporablja **`o4-mini`** za klepet in **`o4-mini`** za procesiranje v ozadju (kontekst/spomin, RAG).
 
 ### 3.2. Informativni Moduli (Metode proti Overthinkanju)
@@ -93,15 +91,15 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 ### 3.3. Sistem Spomina in Konteksta (Memory & Context System)
 * **Opis:** Napreden sistem, ki AI Racionalnemu Prijatelju omogoča ohranjanje kontinuitete, prepoznavanje vzorcev in zagotavljanje globoko personaliziranih odgovorov. *(Podrobnosti v `Memory / Context Feature Document`)*.
 * **Funkcionalnost:**
-    * **Komponente Konteksta:** Statični profil, dinamični profil, povzetek zadnje seanse, **prepoznani vzorci** uporabnikovega razmišljanja (RAG), baza znanja o metodah proti overthinkanju (RAG), zgodovina trenutne seanse, sistemski prompt izbranega avatarja.
-    * **RAG (Retrieval-Augmented Generation):** Dinamično iskanje in vključevanje relevantnih informacij iz **zgodovine sporočil, prepoznanih vzorcev in baze znanja** v AI prompt. Uporablja Supabase AI embeddinge (`gte-small`) in `pgvector`.
-    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, **identifikacija, ekstrakcija in shranjevanje ključnih vzorcev razmišljanja** (z embeddingi za RAG) ter posodabljanje dinamičnega profila uporabnika. Uporabljen model (`o4-mini` ali `40 mini`) je odvisen od nivoja uporabnika[cite: 13, 15].
+    * **Komponente Konteksta:** Specifični statični profil (ime, starostna skupina, glavna tema, cilj), dinamični profil, povzetek zadnje seanse, **prepoznani vzorci** uporabnikovega razmišljanja (RAG), baza znanja o metodah proti overthinkanju (RAG, filtrirano po izbrani stopnji racionalnosti), zgodovina trenutne seanse, sistemski prompt (vezan na stopnjo racionalnosti).
+    * **RAG (Retrieval-Augmented Generation):** Dinamično iskanje in vključevanje relevantnih informacij iz **zgodovine sporočil, prepoznanih vzorcev in baze znanja (filtrirane po racionalnosti)** v AI prompt. Uporablja Supabase AI embeddinge (`gte-small`) in `pgvector`.
+    * **Obdelava ob Koncu Seanse:** Samodejno generiranje povzetka seanse, **identifikacija, ekstrakcija in shranjevanje ključnih vzorcev razmišljanja** (z embeddingi za RAG) ter posodabljanje dinamičnega profila uporabnika. Uporabljen model (`o4-mini` ali `40-mini`) je odvisen od nivoja uporabnika.
 * **Tehnične Zahteve:** Implementacija znotraj Supabase Edge Functions, uporaba definiranih tabel v `database_schema.md` (prilagojeno za 'patterns' namesto 'journey_notes').
 
 ### 3.4. Uporabniški Profil in Zgodovina
 * **Opis:** Zasloni, ki omogočajo upravljanje in pregled uporabniških podatkov in preteklih interakcij.
 * **Funkcionalnost:**
-    * **Profil:** Urejanje statičnih podatkov (iz onboardinga), pregled AI-generiranega dinamičnega profila, **pregled seznama prepoznanih vzorcev**, dostop do nastavitev, odjava, morda menjava avatarja.
+    * **Profil:** Urejanje statičnih podatkov (iz onboardinga: ime, starostna skupina, glavna tema, cilj), pregled AI-generiranega dinamičnega profila, **pregled seznama prepoznanih vzorcev**, dostop do nastavitev (vključno s privzeto stopnjo racionalnosti), odjava.
     * **Zgodovina:** Seznam preteklih seans s povzetki, možnost ogleda celotne zgodovine sporočil zaključene seanse (read-only), možnost brisanja seans.
     * **Nastavitve:** Osnovne nastavitve (npr. upravljanje naročnine - če/ko relevantno) in dostop do pravnih besedil ter brisanja računa.
 * **Tehnične Zahteve:** Pridobivanje in prikazovanje podatkov iz tabel `profiles`, `dynamic_profiles`, `message_patterns` (ali podobno), `sessions`, `messages`. Implementacija funkcionalnosti brisanja in odjave.
@@ -111,10 +109,14 @@ MVP aplikacije Rational Mind zagotavlja varen, zaseben in podpirajoč prostor, k
 ## 4. Obseg MVP-ja (In-Scope vs Out-of-Scope)
 
 ### 4.1. V Obsegu (In-Scope Features - MVP)
-* Osnovna funkcionalnost AI klepeta z **AI Racionalnim Prijateljem** (izbira med 3-5 avatarji).
-* Napreden **Memory / Context System** (kot definiran, s fokusom na prepoznavanju vzorcev in uporabo modelov `o4-mini`/`40 mini` glede na nivo)[cite: 13, 15, 20].
+* Osnovna funkcionalnost AI klepeta z **AI Racionalnim Prijateljem** (odzivnost glede na stopnjo racionalnosti 1-5).
+* Napreden **Memory / Context System** (kot definiran, s fokusom na prepoznavanju vzorcev in uporabo modelov `o4-mini`/`40-mini` glede na nivo, RAG filtriran po racionalnosti).
 * **Tekstovna** in **Glasovna (STT)** interakcija v klepetu.
 * **Opcijski Glasovni Izhod (TTS)** AI odgovorov.
+* **4-5 Informativnih Modulov** o metodah proti overthinkanju (read-only + RAG vir, uporabljen glede na racionalnost).
+* **Onboarding** tok za zbiranje statičnega profila in **izbiro začetne stopnje racionalnosti (1-5)**.
+* **Uporabniški Profil** (statični podatki: ime, starostna skupina, glavna tema, cilj; dinamični profil; prikaz prepoznanih vzorcev).
+* **Zgodovina Seans** (pregled, brisanje).
 * **4-5 Informativnih Modulov** o metodah proti overthinkanju (read-only + RAG vir).
 * **Onboarding** tok za zbiranje statičnega profila in izbiro avatarja.
 * **Uporabniški Profil** (statični/dinamični/prikaz prepoznanih vzorcev).
